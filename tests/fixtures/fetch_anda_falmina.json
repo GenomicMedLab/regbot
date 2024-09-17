@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2024-09-10",
+    "results": {
+      "skip": 0,
+      "limit": 1,
+      "total": 1
+    }
+  },
+  "results": [
+    {
+      "submissions": [
+        {
+          "submission_type": "ORIG",
+          "submission_number": "1",
+          "submission_status": "AP",
+          "submission_status_date": "20120328"
+        },
+        {
+          "submission_type": "SUPPL",
+          "submission_number": "2",
+          "submission_status": "AP",
+          "submission_status_date": "20170809",
+          "review_priority": "STANDARD",
+          "submission_class_code": "LABELING",
+          "submission_class_code_description": "Labeling"
+        },
+        {
+          "submission_type": "SUPPL",
+          "submission_number": "7",
+          "submission_status": "AP",
+          "submission_status_date": "20220429",
+          "review_priority": "STANDARD",
+          "submission_class_code": "LABELING",
+          "submission_class_code_description": "Labeling"
+        }
+      ],
+      "application_number": "ANDA090721",
+      "sponsor_name": "NOVAST LABS LTD",
+      "openfda": {
+        "application_number": [
+          "ANDA090721"
+        ],
+        "brand_name": [
+          "FALMINA"
+        ],
+        "generic_name": [
+          "LEVONORGESTREL AND ETHINYL ESTRADIOL"
+        ],
+        "manufacturer_name": [
+          "Northstar Rx LLC"
+        ],
+        "product_ndc": [
+          "16714-359"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "rxcui": [
+          "242297",
+          "748797",
+          "748868",
+          "1304988"
+        ],
+        "spl_id": [
+          "b65ade06-5fdd-465b-9123-54e898caa35d"
+        ],
+        "spl_set_id": [
+          "cf6f069e-4b78-4adb-b5be-100b9d85aab7"
+        ],
+        "package_ndc": [
+          "16714-359-01",
+          "16714-359-02",
+          "16714-359-03",
+          "16714-359-04"
+        ]
+      },
+      "products": [
+        {
+          "product_number": "001",
+          "reference_drug": "No",
+          "brand_name": "FALMINA",
+          "active_ingredients": [
+            {
+              "name": "ETHINYL ESTRADIOL",
+              "strength": "0.02MG"
+            },
+            {
+              "name": "LEVONORGESTREL",
+              "strength": "0.1MG"
+            }
+          ],
+          "reference_standard": "No",
+          "dosage_form": "TABLET",
+          "route": "ORAL-28",
+          "marketing_status": "Prescription",
+          "te_code": "AB1"
+        }
+      ]
+    }
+  ]
+}

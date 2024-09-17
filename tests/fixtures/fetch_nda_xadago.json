@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "disclaimer": "Do not rely on openFDA to make decisions regarding medical care. While we make every effort to ensure that data is accurate, you should assume all results are unvalidated. We may limit or otherwise restrict your access to the API in line with our Terms of Service.",
+    "terms": "https://open.fda.gov/terms/",
+    "license": "https://open.fda.gov/license/",
+    "last_updated": "2024-09-10",
+    "results": {
+      "skip": 0,
+      "limit": 1,
+      "total": 1
+    }
+  },
+  "results": [
+    {
+      "submissions": [
+        {
+          "submission_type": "SUPPL",
+          "submission_number": "5",
+          "submission_status": "AP",
+          "submission_status_date": "20191125",
+          "review_priority": "STANDARD",
+          "submission_class_code": "LABELING",
+          "submission_class_code_description": "Labeling",
+          "application_docs": [
+            {
+              "id": "61081",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/appletter/2019/207145Orig1s005ltr.pdf",
+              "date": "20191127",
+              "type": "Letter"
+            },
+            {
+              "id": "61100",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2019/207145s005lbl.pdf",
+              "date": "20191129",
+              "type": "Label"
+            }
+          ]
+        },
+        {
+          "submission_type": "SUPPL",
+          "submission_number": "1",
+          "submission_status": "AP",
+          "submission_status_date": "20170616",
+          "review_priority": "STANDARD",
+          "submission_class_code": "LABELING",
+          "submission_class_code_description": "Labeling",
+          "application_docs": [
+            {
+              "id": "48756",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2017/207145s001lbl.pdf",
+              "date": "20170619",
+              "type": "Label"
+            },
+            {
+              "id": "48775",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/appletter/2017/207145Orig1s001ltr.pdf",
+              "date": "20170620",
+              "type": "Letter"
+            }
+          ]
+        },
+        {
+          "submission_type": "SUPPL",
+          "submission_number": "6",
+          "submission_status": "AP",
+          "submission_status_date": "20210806",
+          "review_priority": "STANDARD",
+          "submission_class_code": "LABELING",
+          "submission_class_code_description": "Labeling",
+          "application_docs": [
+            {
+              "id": "68316",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2021/207145s006lbl.pdf",
+              "date": "20210809",
+              "type": "Label"
+            },
+            {
+              "id": "68325",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/appletter/2021/207145Orig1s006ltr.pdf",
+              "date": "20210810",
+              "type": "Letter"
+            }
+          ]
+        },
+        {
+          "submission_type": "ORIG",
+          "submission_number": "1",
+          "submission_status": "AP",
+          "submission_status_date": "20170321",
+          "review_priority": "STANDARD",
+          "submission_class_code": "TYPE 1",
+          "submission_class_code_description": "Type 1 - New Molecular Entity",
+          "application_docs": [
+            {
+              "id": "47630",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2017/207145lbl.pdf",
+              "date": "20170322",
+              "type": "Label"
+            },
+            {
+              "id": "47730",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/appletter/2017/207145Orig1s000ltr.pdf",
+              "date": "20170328",
+              "type": "Letter"
+            },
+            {
+              "id": "48180",
+              "url": "http://www.accessdata.fda.gov/drugsatfda_docs/nda/2017/207145Orig1s000TOC.cfm",
+              "date": "20170501",
+              "type": "Review"
+            }
+          ]
+        }
+      ],
+      "application_number": "NDA207145",
+      "sponsor_name": "MDD US",
+      "openfda": {
+        "application_number": [
+          "NDA207145"
+        ],
+        "brand_name": [
+          "XADAGO"
+        ],
+        "generic_name": [
+          "SAFINAMIDE MESYLATE"
+        ],
+        "manufacturer_name": [
+          "MDD US Operations LLC, a subsidiary of Supernus Pharmaceuticals, Inc."
+        ],
+        "product_ndc": [
+          "27505-110",
+          "27505-111"
+        ],
+        "product_type": [
+          "HUMAN PRESCRIPTION DRUG"
+        ],
+        "route": [
+          "ORAL"
+        ],
+        "substance_name": [
+          "SAFINAMIDE MESYLATE"
+        ],
+        "rxcui": [
+          "1922466",
+          "1922472",
+          "1922474",
+          "1922476"
+        ],
+        "spl_id": [
+          "0cf4e97f-18de-5426-e063-6294a90ac4b0"
+        ],
+        "spl_set_id": [
+          "c4d65f28-983f-42b4-bb23-023ae0fe81b2"
+        ],
+        "package_ndc": [
+          "27505-110-30",
+          "27505-110-90",
+          "27505-110-14",
+          "27505-111-30",
+          "27505-111-90",
+          "27505-111-14"
+        ],
+        "unii": [
+          "YS90V3DTX0"
+        ]
+      },
+      "products": [
+        {
+          "product_number": "001",
+          "reference_drug": "Yes",
+          "brand_name": "XADAGO",
+          "active_ingredients": [
+            {
+              "name": "SAFINAMIDE MESYLATE",
+              "strength": "EQ 50MG BASE"
+            }
+          ],
+          "reference_standard": "No",
+          "dosage_form": "TABLET",
+          "route": "ORAL",
+          "marketing_status": "Prescription",
+          "te_code": "AB"
+        },
+        {
+          "product_number": "002",
+          "reference_drug": "Yes",
+          "brand_name": "XADAGO",
+          "active_ingredients": [
+            {
+              "name": "SAFINAMIDE MESYLATE",
+              "strength": "EQ 100MG BASE"
+            }
+          ],
+          "reference_standard": "Yes",
+          "dosage_form": "TABLET",
+          "route": "ORAL",
+          "marketing_status": "Prescription",
+          "te_code": "AB"
+        }
+      ]
+    }
+  ]
+}
