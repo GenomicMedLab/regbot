@@ -109,6 +109,7 @@ class ProductRoute(str, Enum):
     """Provide values for product routes."""
 
     ORAL = "oral"
+    ORAL_28 = "oral-28"
 
 
 class ProductDosageForm(str, Enum):
@@ -127,6 +128,7 @@ class ProductTherapeuticEquivalencyCode(str, Enum):
 
     AA = "aa"
     AB = "ab"
+    AB1 = "ab1"
     BC = "bc"
 
 
