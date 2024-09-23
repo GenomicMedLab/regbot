@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import re
 from collections import namedtuple
 from enum import Enum
 
@@ -68,12 +69,63 @@ OpenFda = namedtuple(
 )
 
 
+def _map_to_enum(cls: type[Enum], value: str, mapping: dict) -> Enum:
+    """Use in enum _missing_ methods to map alternate constructions to python-legal values."""
+    try:
+        if value in mapping:
+            return mapping[value]
+        msg = f"'{value}' is not a valid {cls.__name__}"
+        raise ValueError(msg)
+    except AttributeError as _:
+        msg = f"'{value}' is not a valid {cls.__name__}"
+        raise ValueError(msg) from None
+
+
 class ApplicationDocType(str, Enum):
     """Provide values for application document type."""
 
+    AT = "at"
+    EXCLUSIVITY_LETTER = "exclusivity_letter"
+    FDA_PRESS_RELEASE = "fda_press_release"
+    FEDERAL_REGISTER_NOTICE = "federal_register_notice"
+    HEALTHCARE_PROFESSIONAL_SHEET = "healthcare_professional_sheet"
     LABEL = "label"
     LETTER = "letter"
+    MEDICATION_GUIDE = ("medication_guide",)
+    OTHER = "other"
+    OTHER_IMPORTANT_INFORMATION_FROM_FDA = "other_important_information_from_fda"
+    PATIENT_INFORMATION_SHEET = "patient_information_sheet"
+    PATIENT_PACKAGE_INSERT = "patient_package_insert"
+    PEDIATRIC_ADDENDUM = "pediatric_addendum"
+    PEDIATRIC_AMENDMENT_1 = "pediatric_amendment_1"
+    PEDIATRIC_AMENDMENT_2 = "pediatric_amendment_2"
+    PEDIATRIC_AMENDMENT_3 = "pediatric_amendment_3"
+    PEDIATRIC_AMENDMENT_4 = "pediatric_amendment_4"
+    PEDIATRIC_AMENDMENT_5 = "pediatric_amendment_5"
+    PEDIATRIC_AMENDMENT_6 = "pediatric_amendment_6"
+    PEDIATRIC_AMENDMENT_7 = "pediatric_amendment_7"
+    PEDIATRIC_CDTL_REVIEW = "pediatric_cdtl_review"
+    PEDIATRIC_CLINICAL_PHARMACOLOGY_ADDENDUM = (
+        "pediatric_clinical_pharmacology_addendum"
+    )
+    PEDIATRIC_CLINICAL_PHARMACOLOGY_REVIEW = "pediatric_clinical_pharmacology_review"
+    PEDIATRIC_DD_SUMMARY_REVIEW = "pediatric_dd_summary_review"
+    PEDIATRIC_MEDICAL_REVIEW = "pediatric_medical_review"
+    PEDIATRIC_MEMO = "pediatric_memo"
+    PEDIATRIC_OTHER = "pediatric_other"
+    PEDIATRIC_REISSUE = "pediatric_reissue"
+    PEDIATRIC_REISSUE_AMENDMENT_1 = "pediatric_reissue_amendment_1"
+    PEDIATRIC_REISSUE_AMENDMENT_2 = "pediatric_reissue_amendment_2"
+    PEDIATRIC_REISSUE_AMENDMENT_3 = "pediatric_reissue_amendment_3"
+    PEDIATRIC_REISSUE_AMENDMENT_4 = "pediatric_reissue_amendment_4"
+    PEDIATRIC_REISSUE_AMENDMENT_5 = "pediatric_reissue_amendment_5"
+    PEDIATRIC_REISSUE_AMENDMENT_6 = "pediatric_reissue_amendment_6"
+    PEDIATRIC_STATISTICAL_REVIEW = "pediatric_statistical_review"
+    PEDIATRIC_WRITTEN_REQUEST = "pediatric_written_request"
+    REMS = "rems"
     REVIEW = "review"
+    SUMMARY_REVIEW = "summary_review"
+    WITHDRAWAL_NOTICE = "withdrawal_notice"
 
 
 class ProductMarketingStatus(str, Enum):
@@ -91,24 +143,92 @@ class ProductMarketingStatus(str, Enum):
     PRESCRIPTION = "prescription"
     OTC = "over_the_counter"
     DISCONTINUED = "discontinued"
+    NONE_TENTATIVE_APPROVAL = "none_tentative_approval"
     NONE = "none"
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        try:
-            if value.lower() == "over-the-counter":
-                return cls.OTC
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg)
-        except AttributeError as _:
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg) from None
+        return _map_to_enum(cls, value, {"over-the-counter": cls.OTC})
 
 
 class ProductRoute(str, Enum):
-    """Provide values for product routes."""
+    """Provide values for product routes.
 
+    TODO: make compound terms just return multiple individual enums?
+    """
+
+    AURICULAR_OTIC = "auricular_otic"
+    BILIARY = "biliary"
+    BUCCAL = "buccal"
+    DENTAL = "dental"
+    EPIDURAL = "epidural"
+    FOR_RX_COMPOUNDING = "for_rx_compounding"
+    IMPLANTATION = "implantation"
+    IM_IV = "im_iv"
+    INFILTRATION = "infiltration"
+    INHALATION = "inhalation"
+    INJECTION = "injection"
+    INTRAARTERIAL = "intra_arterial"
+    INTRACARDIAC = "intracardiac"
+    INTRACAUDAL = "intracaudal"
+    INTRACAVERNOUS = "intracavernous"
+    INTRALESIONAL = "intralesional"
+    INTRAMUSCULAR = "intramuscular"
+    INTRAOCULAR = "intraocular"
+    INTRAPERITONEAL = "intraperitoneal"
+    INTRAPLEURAL = "intrapleural"
+    INTRASYNOVIAL = "intrasynovial"
+    INTRATHECAL = "intrathecal"
+    INTRATRACHEAL = "intratracheal"
+    INTRAUTERINE = "intrauterine"
+    INTRAVASCULAR = "intravascular"
+    INTRAVENOUS = "intravenous"
+    INTRAVESICAL = "intravesical"
+    INTRAVESICULAR = "intravesicular"
+    INTRAVITREAL = "intravitreal"
+    INTRA_ARTICULAR = "intra_articular"
+    IONTOPHORESIS = "iontophoresis"
+    IRRIGATION = "irrigation"
+    IV_INFUSION = "iv_infusion"
+    NASAL = "nasal"
+    N_A = "n_a"
+    OPHTHALMIC = "ophthalmic"
     ORAL = "oral"
+    ORALLY_DISINTEGRATING = "orally_disintegrating"
+    ORAL_20 = "oral_20"
+    ORAL_21 = "oral_21"
+    ORAL_28 = "oral_28"
+    OTIC = "otic"
+    PARENTERAL = "parenteral"
+    PERCUTANEOUS = "percutaneous"
+    PERFUSION = "perfusion"
+    PERIARTICULAR = "periarticular"
+    PERINEURAL = "perineural"
+    PERIODONTAL = "periodontal"
+    POWDER_FOR_SOLUTION = "powder_for_solution"
+    RECTAL = "rectal"
+    RESPIRATORY_INHALATION = "respiratory_inhalation"
+    SOFT_TISSUE = "soft_tissue"
+    SPINAL = "spinal"
+    SUBCUTANEOUS = "subcutaneous"
+    SUBLINGUAL = "sublingual"
+    TOPICAL = "topical"
+    TRANSDERMAL = "transdermal"
+    TRANSMUCOSAL = "transmucosal"
+    URETERAL = "ureteral"
+    URETHRAL = "urethral"
+    VAGINAL = "vaginal"
+
+    @classmethod
+    def _missing_(cls, value):  # noqa: ANN001 ANN206
+        return _map_to_enum(
+            cls,
+            value,
+            {
+                "n/a": cls.N_A,
+                "powder,for_solution": cls.POWDER_FOR_SOLUTION,
+            },
+        )
 
 
 class ProductDosageForm(str, Enum):
@@ -118,8 +238,94 @@ class ProductDosageForm(str, Enum):
     https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-glossary-terms#form
     """
 
-    TABLET = "tablet"
+    AEROSOL = "aerosol"
+    AEROSOL_FOAM = "aerosol_foam"
+    AEROSOL_METERED = "aerosol_metered"
     CAPSULE = "capsule"
+    CAPSULE_DELAYED_RELEASE = "capsule_delayed_release"
+    CAPSULE_DELAYED_REL_PELLETS = "capsule_delayed_rel_pellets"
+    CAPSULE_DELAYED_REL_PELLETS_TABLET = "capsule_delayed_rel_pellets_tablet"
+    CAPSULE_EXTENDED_RELEASE = "capsule_extended_release"
+    CAPSULE_PELLET = "capsule_pellet"
+    CAPSULE_PELLETTE = "capsule_pellette"
+    CONCENTRATE = "concentrate"
+    CREAM = "cream"
+    CREAM_AUGMENTED = "cream_augmented"
+    CREAM_SUPPOSITORY = "cream_suppository"
+    CREAM_TABLET = "cream_tablet"
+    DISC = "disc"
+    DRESSING = "dressing"
+    ELIXIR = "elixir"
+    EMULSION = "emulsion"
+    ENEMA = "enema"
+    FIBER_EXTENDED_RELEASE = "fiber_extended_release"
+    FILM = "film"
+    FILM_EXTENDED_RELEASE = "film_extended_release"
+    FOR_SOLUTION = "for_solution"
+    FOR_SUSPENSION = "for_suspension"
+    FOR_SUSPENSION_EXTENDED_RELEASE = "for_suspension_extended_release"
+    FOR_SUSPENSION_TABLET = "for_suspension_tablet"
+    GAS = "gas"
+    GEL = "gel"
+    GEL_AUGMENTED = "gel_augmented"
+    GEL_METERED = "gel_metered"
+    GRANULE = "granule"
+    GRANULE_EFFERVESCENT = "granule_effervescent"
+    GUM_CHEWING = "gum_chewing"
+    IMPLANT = "implant"
+    INJECTABLE = "injectable"
+    INJECTABLE_LIPID_COMPLEX = "injectable_lipid_complex"
+    INJECTABLE_LIPOSOMAL = "injectable_liposomal"
+    INJECTION = "injection"
+    INSERT = "insert"
+    INSERT_EXTENDED_RELEASE = "insert_extended_release"
+    INTRAUTERINE_DEVICE = "intrauterine_device"
+    JELLY = "jelly"
+    LIQUID = "liquid"
+    LOTION = "lotion"
+    LOTION_AUGMENTED = "lotion_augmented"
+    LOTION_SHAMPOO = "lotion_shampoo"
+    N_A = "n_a"
+    OIL = "oil"
+    OIL_DROPS = "oil_drops"
+    OINTMENT = "ointment"
+    PASTE = "paste"
+    PASTILLE = "pastille"
+    PATCH = "patch"
+    POWDER = "powder"
+    POWDER_METERED = "powder_metered"
+    RING = "ring"
+    SHAMPOO = "shampoo"
+    SOAP = "soap"
+    SOLUTION = "solution"
+    SOLUTION_DROPS = "solution_drops"
+    SOLUTION_EXTENDED_RELEASE = "solution_extended_release"
+    SOLUTION_METERED = "solution_metered"
+    SPONGE = "sponge"
+    SPRAY = "spray"
+    SPRAY_METERED = "spray_metered"
+    SUPPOSITORY = "suppository"
+    SUSPENSION = "suspension"
+    SUSPENSION_DROPS = "suspension_drops"
+    SUSPENSION_EXTENDED_RELEASE = "suspension_extended_release"
+    SWAB = "swab"
+    SYRUP = "syrup"
+    SYSTEM = "system"
+    SYSTEM_EXTENDED_RELEASE = "system_extended_release"
+    TABLET = "tablet"
+    TABLET_CHEWABLE = "tablet_chewable"
+    TABLET_COATED_PARTICLES = "tablet_coated_particles"
+    TABLET_DELAYED_RELEASE = "tablet_delayed_release"
+    TABLET_EFFERVESCENT = "tablet_effervescent"
+    TABLET_EXTENDED_RELEASE = "tablet_extended_release"
+    TABLET_FOR_SUSPENSION = "tablet_for_suspension"
+    TABLET_ORALLY_DISINTEGRATING = "tablet_orally_disintegrating"
+    TABLET_ORALLY_DISINTEGRATING_EXTENDED_RELEASE = (
+        "tablet_orally_disintegrating_extended_release"
+    )
+    TAMPON = "tampon"
+    TROCHE_LOZENGE = "troche_lozenge"
+    VIAL = "vial"
 
 
 class ProductTherapeuticEquivalencyCode(str, Enum):
@@ -127,24 +333,35 @@ class ProductTherapeuticEquivalencyCode(str, Enum):
 
     AA = "aa"
     AB = "ab"
+    AB1 = "ab1"
+    AB2 = "ab2"
+    AB3 = "ab3"
+    AB4 = "ab4"
+    AN = "an"
+    AO = "ao"
+    AP = "ap"
+    AP1 = "ap1"
+    AP2 = "ap2"
+    AT = "at"
+    AT1 = "at1"
     BC = "bc"
+    BS = "bs"
+    BT = "bt"
+    BX = "bx"
+    TBD = "tbd"
 
 
 class OpenFdaProductType(str, Enum):
     """Define product type."""
 
     HUMAN_PRESCRIPTION_DRUG = "human_prescription_drug"
+    HUMAN_OTC_DRUG = "human_otc_drug"
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        try:
-            if value.lower() == "human prescription drug":
-                return cls.HUMAN_PRESCRIPTION_DRUG
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg)
-        except AttributeError as _:
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg) from None
+        return _map_to_enum(
+            cls, value, {"human prescription drug": cls.HUMAN_PRESCRIPTION_DRUG}
+        )
 
 
 class SubmissionType(str, Enum):
@@ -158,6 +375,7 @@ class SubmissionStatus(str, Enum):
     """Provide values for FDA submission status."""
 
     AP = "ap"
+    TA = "ta"
 
 
 class SubmissionReviewPriority(str, Enum):
@@ -167,54 +385,49 @@ class SubmissionReviewPriority(str, Enum):
     PRIORITY = "priority"
     UNKNOWN = "unknown"
     N_A = "n_a"
-    REQUIRE_901 = "require 901"
+    REQUIRE_901 = "require_901"
+    ORDER_901 = "order_901"
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        try:
-            val_lower = value.lower()
-            if val_lower == "n/a":
-                return cls.N_A
-            if val_lower == "901 required":
-                return cls.REQUIRE_901
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg)
-        except AttributeError as _:
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg) from None
+        return _map_to_enum(
+            cls,
+            value,
+            {
+                "n/a": cls.N_A,
+                "901_required": cls.REQUIRE_901,
+                "901_order": cls.ORDER_901,
+            },
+        )
 
 
 class SubmissionClassCode(str, Enum):
     """Provide values for class code for FDA submission."""
 
-    UNKNOWN = "unknown"
+    BIOEQUIV = "bioequiv"
     EFFICACY = "efficacy"
-    MANUF_CMC = "manuf_cmc"  # TODO context
     LABELING = "labeling"
+    MANUF_CMC = "manuf_cmc"  # TODO context
+    MEDGAS = "medgas"
+    N_A = "n_a"
+    REMS = "rems"
+    S = "s"
     TYPE_1 = "type_1"
+    TYPE_10 = "type_10"
+    TYPE_1_4 = "type_1_4"
     TYPE_2 = "type_2"
+    TYPE_2_3 = "type_2_3"
+    TYPE_2_4 = "type_2_4"
     TYPE_3 = "type_3"
+    TYPE_3_4 = "type_3_4"
     TYPE_4 = "type_4"
-
-    @classmethod
-    def _missing_(cls, value):  # noqa: ANN001 ANN206
-        try:
-            val_lower = value.lower()
-            if val_lower == "manuf (cmc)":
-                return cls.MANUF_CMC
-            if val_lower == "type 1":
-                return cls.TYPE_1
-            if val_lower == "type 2":
-                return cls.TYPE_2
-            if val_lower == "type 3":
-                return cls.TYPE_3
-            if val_lower == "type 4":
-                return cls.TYPE_4
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg)
-        except AttributeError as _:
-            msg = f"'{value}' is not a valid {cls.__name__}"
-            raise ValueError(msg) from None
+    TYPE_4_5 = "type_4_5"
+    TYPE_5 = "type_5"
+    TYPE_6 = "type_6"
+    TYPE_7 = "type_7"
+    TYPE_8 = "type_8"
+    TYPE_9 = "type_9"
+    UNKNOWN = "unknown"
 
 
 def _make_truthy(status: str | None) -> bool | str | None:
@@ -225,6 +438,8 @@ def _make_truthy(status: str | None) -> bool | str | None:
         return False
     if lower_status == "yes":
         return True
+    if lower_status == "tbd":
+        return None
     _logger.error("Encountered unknown value for converting to bool: %s", status)
     return status
 
@@ -233,7 +448,15 @@ def _enumify(value: str | None, CandidateEnum: type[Enum]) -> Enum | str | None:
     if value is None:
         return None
     try:
-        return CandidateEnum(value.lower())
+        return CandidateEnum(
+            value.lower()
+            .replace(", ", "_")
+            .replace(" ", "_")
+            .replace("-", "_")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("/", "_")
+        )
     except ValueError:
         _logger.error(
             "Unable to enumify value '%s' into enum '%s'", value, CandidateEnum
@@ -265,19 +488,25 @@ def _get_product(data: dict, normalize: bool) -> Product:
     )
     reference_standard = (
         _make_truthy(data["reference_standard"])
-        if normalize
-        else data["reference_standard"]
+        if normalize and ("reference_standard" in data)
+        else data.get("reference_standard")
     )
     dosage_form = (
         _enumify(data["dosage_form"], ProductDosageForm)
         if normalize
         else data["dosage_form"]
     )
-    route = (
-        _enumify(data["route"], ProductRoute)
-        if normalize and "route" in data
-        else data.get("route")
-    )
+    raw_route = data.get("route")
+    if raw_route is None:
+        route = None
+    else:
+        if isinstance(raw_route, str):
+            raw_route = re.split(r", (?!delayed|extended)", raw_route)
+        route = (
+            [_enumify(r, ProductRoute) for r in raw_route]
+            if normalize
+            else data["route"]
+        )
     marketing_status = (
         _enumify(data["marketing_status"], ProductMarketingStatus)
         if normalize
@@ -288,12 +517,16 @@ def _get_product(data: dict, normalize: bool) -> Product:
         if normalize and "te_code" in data
         else data.get("te_code")
     )
+
     return Product(
         product_number=data["product_number"],
         reference_drug=reference_drug,
         brand_name=data["brand_name"],
         active_ingredients=[
-            ActiveIngredient(**ai) for ai in data["active_ingredients"]
+            ActiveIngredient(**ai)
+            if "strength" in ai
+            else ActiveIngredient(name=ai["name"], strength=None)
+            for ai in data["active_ingredients"]
         ],
         reference_standard=reference_standard,
         dosage_form=dosage_form,
@@ -328,8 +561,8 @@ def _get_submission(data: dict, normalize: bool) -> Submission:
     )
     submission_status = (
         _enumify(data["submission_status"], SubmissionStatus)
-        if normalize
-        else data["submission_status"]
+        if normalize and ("submission_status" in data)
+        else data.get("submission_status")
     )
     submission_status_date = (
         _make_datetime(data["submission_status_date"])
@@ -365,10 +598,14 @@ def _get_submission(data: dict, normalize: bool) -> Submission:
 
 
 def _get_openfda(data: dict, normalize: bool) -> OpenFda:
-    product_type = [
-        _enumify(pt, OpenFdaProductType) if normalize else pt
-        for pt in data["product_type"]
-    ]
+    product_type = (
+        [
+            _enumify(pt, OpenFdaProductType) if normalize else pt
+            for pt in data["product_type"]
+        ]
+        if "product_type" in data
+        else None
+    )
     if "route" in data:
         route = [
             _enumify(rt, ProductRoute) if normalize else rt for rt in data["route"]
@@ -376,18 +613,18 @@ def _get_openfda(data: dict, normalize: bool) -> OpenFda:
     else:
         route = None
     return OpenFda(
-        application_number=data["application_number"],
-        brand_name=data["brand_name"],
-        generic_name=data["generic_name"],
-        manufacturer_name=data["manufacturer_name"],
-        product_ndc=data["product_ndc"],
+        application_number=data.get("application_number"),
+        brand_name=data.get("brand_name"),
+        generic_name=data.get("generic_name"),
+        manufacturer_name=data.get("manufacturer_name"),
+        product_ndc=data.get("product_ndc"),
         product_type=product_type,
         route=route,
         substance_name=data.get("substance_name"),
-        rxcui=data["rxcui"],
-        spl_id=data["spl_id"],
-        spl_set_id=data["spl_set_id"],
-        package_ndc=data["package_ndc"],
+        rxcui=data.get("rxcui"),
+        spl_id=data.get("spl_id"),
+        spl_set_id=data.get("spl_set_id"),
+        package_ndc=data.get("package_ndc"),
         nui=data.get("nui"),
         pharm_class_epc=data.get("pharm_class_epc"),
         pharm_class_cs=data.get("pharm_class_cs"),
@@ -398,30 +635,44 @@ def _get_openfda(data: dict, normalize: bool) -> OpenFda:
 
 def _get_result(data: dict, normalize: bool) -> Result:
     return Result(
-        submissions=[_get_submission(s, normalize) for s in data["submissions"]],
+        submissions=[_get_submission(s, normalize) for s in data["submissions"]]
+        if "submissions" in data
+        else None,
         application_number=data["application_number"],
         sponsor_name=data["sponsor_name"],
-        openfda=_get_openfda(data["openfda"], normalize),
+        openfda=_get_openfda(data["openfda"], normalize) if "openfda" in data else None,
         products=[_get_product(p, normalize) for p in data["products"]],
     )
 
 
-def get_drugsfda_results(url: str, normalize: bool = False) -> list[Result] | None:
+def get_drugsfda_results(
+    url: str, normalize: bool = False, limit: int = 500
+) -> list[Result] | None:
     """Get Drugs@FDA data given an API query URL.
 
     :param url: URL to request
     :param normalize: if ``True``, try to normalize values to controlled enumerations
         and appropriate Python datatypes
+    :param limit: # of results per page
     :return: list of Drugs@FDA ``Result``s if successful
     :raise RequestException: if HTTP response status != 200
     """
-    with requests.get(url, timeout=30) as r:
-        try:
-            r.raise_for_status()
-        except RequestException as e:
-            raise e
-        data = r.json()
-    return [_get_result(r, normalize) for r in data["results"]]
+    results = []
+    remaining = True
+    skip = 0
+    while remaining:
+        full_url = f"{url}&limit={limit}&skip={skip}"
+        _logger.debug("Issuing GET request to %s", full_url)
+        with requests.get(full_url, timeout=30) as r:
+            try:
+                r.raise_for_status()
+            except RequestException as e:
+                raise e
+            data = r.json()
+        results += data["results"]
+        skip = data["meta"]["results"]["skip"] + len(data["results"])
+        remaining = (data["meta"]["results"]["total"] > skip) or (skip >= 25000)
+    return [_get_result(r, normalize) for r in results]
 
 
 def get_anda_results(anda: str, normalize: bool = False) -> list[Result] | None:
@@ -432,7 +683,6 @@ def get_anda_results(anda: str, normalize: bool = False) -> list[Result] | None:
         and appropriate Python datatypes
     :return: list of Drugs@FDA ``Result``s if successful
     """
-    """TODO"""
     url = f"https://api.fda.gov/drug/drugsfda.json?search=openfda.application_number:ANDA{anda}"
     return get_drugsfda_results(url, normalize)
 
