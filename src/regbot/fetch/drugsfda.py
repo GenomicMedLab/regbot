@@ -9,6 +9,8 @@ from enum import Enum
 import requests
 from requests.exceptions import RequestException
 
+from regbot.fetch.class_utils import map_to_enum
+
 _logger = logging.getLogger(__name__)
 
 
@@ -67,18 +69,6 @@ OpenFda = namedtuple(
         "unii",
     ),
 )
-
-
-def _map_to_enum(cls: type[Enum], value: str, mapping: dict) -> Enum:
-    """Use in enum _missing_ methods to map alternate constructions to python-legal values."""
-    try:
-        if value in mapping:
-            return mapping[value]
-        msg = f"'{value}' is not a valid {cls.__name__}"
-        raise ValueError(msg)
-    except AttributeError as _:
-        msg = f"'{value}' is not a valid {cls.__name__}"
-        raise ValueError(msg) from None
 
 
 class ApplicationDocType(str, Enum):
@@ -148,7 +138,7 @@ class ProductMarketingStatus(str, Enum):
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        return _map_to_enum(cls, value, {"over-the-counter": cls.OTC})
+        return map_to_enum(cls, value, {"over-the-counter": cls.OTC})
 
 
 class ProductRoute(str, Enum):
@@ -221,7 +211,7 @@ class ProductRoute(str, Enum):
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        return _map_to_enum(
+        return map_to_enum(
             cls,
             value,
             {
@@ -359,7 +349,7 @@ class OpenFdaProductType(str, Enum):
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        return _map_to_enum(
+        return map_to_enum(
             cls, value, {"human prescription drug": cls.HUMAN_PRESCRIPTION_DRUG}
         )
 
@@ -390,7 +380,7 @@ class SubmissionReviewPriority(str, Enum):
 
     @classmethod
     def _missing_(cls, value):  # noqa: ANN001 ANN206
-        return _map_to_enum(
+        return map_to_enum(
             cls,
             value,
             {
@@ -667,6 +657,9 @@ def get_drugsfda_results(
             try:
                 r.raise_for_status()
             except RequestException as e:
+                _logger.warning(
+                    "Request to %s returned status code %s", full_url, r.status_code
+                )
                 raise e
             data = r.json()
         results += data["results"]
