@@ -1,4 +1,4 @@
-# regbot
+# 🤖 regbot 🤖
 
 [![image](https://img.shields.io/pypi/v/regbot.svg)](https://pypi.python.org/pypi/regbot)
 [![image](https://img.shields.io/pypi/l/regbot.svg)](https://pypi.python.org/pypi/regbot)
