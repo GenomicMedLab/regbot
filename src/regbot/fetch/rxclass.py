@@ -140,7 +140,7 @@ def _get_classification(
 
 
 def _get_relation(raw_value: str | None, normalize: bool) -> str | Relation | None:
-    if raw_value is None:
+    if not raw_value:
         return None
     if normalize:
         return Relation(raw_value.lower())
