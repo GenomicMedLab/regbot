@@ -635,7 +635,7 @@ def _get_result(data: dict, normalize: bool) -> Result:
     )
 
 
-def get_drugsfda_results(
+def make_drugsatfda_request(
     url: str, normalize: bool = False, limit: int = 500
 ) -> list[Result] | None:
     """Get Drugs@FDA data given an API query URL.
@@ -677,7 +677,7 @@ def get_anda_results(anda: str, normalize: bool = False) -> list[Result] | None:
     :return: list of Drugs@FDA ``Result``s if successful
     """
     url = f"https://api.fda.gov/drug/drugsfda.json?search=openfda.application_number:ANDA{anda}"
-    return get_drugsfda_results(url, normalize)
+    return make_drugsatfda_request(url, normalize)
 
 
 def get_nda_results(nda: str, normalize: bool = False) -> list[Result] | None:
@@ -689,4 +689,4 @@ def get_nda_results(nda: str, normalize: bool = False) -> list[Result] | None:
     :return: list of Drugs@FDA ``Result``s if successful
     """
     url = f"https://api.fda.gov/drug/drugsfda.json?search=openfda.application_number:NDA{nda}"
-    return get_drugsfda_results(url, normalize)
+    return make_drugsatfda_request(url, normalize)
