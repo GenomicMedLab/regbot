@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests_mock
 
-from regbot.fetch.drugsfda import get_anda_results, get_nda_results
+from regbot.drugsfda.fetch import fetch_anda_data, fetch_nda_data
 
 
 def test_get_anda_results(fixtures_dir: Path):
@@ -17,7 +17,7 @@ def test_get_anda_results(fixtures_dir: Path):
             text=json_response.read(),
         )
 
-        results = get_anda_results("090721", True)
+        results = fetch_anda_data("090721", True)
         assert results
         assert len(results) > 0
 
@@ -32,6 +32,6 @@ def test_get_nda_results(fixtures_dir: Path):
             text=json_response.read(),
         )
 
-        results = get_nda_results("207145", True)
+        results = fetch_nda_data("207145", True)
         assert results
         assert len(results) > 0

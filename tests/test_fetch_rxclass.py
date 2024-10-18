@@ -2,7 +2,7 @@ from pathlib import Path
 
 import requests_mock
 
-from regbot.fetch.rxclass import get_drug_class_info
+from regbot.rxclass.fetch import get_drug_class_info
 
 
 def test_get_rxclass(fixtures_dir: Path):
