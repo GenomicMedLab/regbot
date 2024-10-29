@@ -1,0 +1,618 @@
+{
+	"rxclassDrugInfoList": {
+		"rxclassDrugInfo": [
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "129557000",
+					"className": "Protein-tyrosine kinase inhibitor-containing product",
+					"classType": "DISPOS",
+					"classUrl": "http://snomed.info/id/129557000"
+				},
+				"rela": "isa_disposition",
+				"relaSource": "SNOMEDCT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "27867009",
+					"className": "Antineoplastic agent",
+					"classType": "THERAP",
+					"classUrl": "http://snomed.info/id/27867009"
+				},
+				"rela": "isa_therapeutic",
+				"relaSource": "SNOMEDCT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "768609001",
+					"className": "Pyrimidine-containing product",
+					"classType": "STRUCT",
+					"classUrl": "http://snomed.info/id/768609001"
+				},
+				"rela": "isa_structure",
+				"relaSource": "SNOMEDCT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "860929000",
+					"className": "Benzamide structure-containing product",
+					"classType": "STRUCT",
+					"classUrl": "http://snomed.info/id/860929000"
+				},
+				"rela": "isa_structure",
+				"relaSource": "SNOMEDCT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D000068877",
+					"className": "Imatinib Mesylate",
+					"classType": "CHEM"
+				},
+				"rela": "has_ingredient",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D007945",
+					"className": "Leukemia, Lymphoid",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D007951",
+					"className": "Leukemia, Myeloid",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D017681",
+					"className": "Hypereosinophilic Syndrome",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D018223",
+					"className": "Dermatofibrosarcoma",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D034721",
+					"className": "Mastocytosis, Systemic",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "D054437",
+					"className": "Myelodysplastic-Myeloproliferative Diseases",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATC"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000009689",
+					"className": "Increased T Lymphocyte Destruction",
+					"classType": "PE"
+				},
+				"rela": "has_pe",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000020009",
+					"className": "Bcr-Abl Tyrosine Kinase Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "DAILYMED"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000020009",
+					"className": "Bcr-Abl Tyrosine Kinase Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000020009",
+					"className": "Bcr-Abl Tyrosine Kinase Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "FDASPL"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000175605",
+					"className": "Kinase Inhibitor",
+					"classType": "EPC"
+				},
+				"rela": "has_epc",
+				"relaSource": "DAILYMED"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000175605",
+					"className": "Kinase Inhibitor",
+					"classType": "EPC"
+				},
+				"rela": "has_epc",
+				"relaSource": "FDASPL"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000175672",
+					"className": "Cellular Proliferation Alteration",
+					"classType": "PE"
+				},
+				"rela": "has_pe",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000182137",
+					"className": "Cytochrome P450 2D6 Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "FDASPL"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000182137",
+					"className": "Cytochrome P450 2D6 Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "DAILYMED"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000182141",
+					"className": "Cytochrome P450 3A4 Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "FDASPL"
+			},
+			{
+				"minConcept": { "rxcui": "282388", "name": "imatinib", "tty": "IN" },
+				"rxclassMinConceptItem": {
+					"classId": "N0000182141",
+					"className": "Cytochrome P450 3A4 Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "DAILYMED"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284206",
+					"name": "imatinib 100 MG Oral Capsule",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D000068877",
+					"className": "Imatinib Mesylate",
+					"classType": "CHEM"
+				},
+				"rela": "has_ingredient",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D001752",
+					"className": "Blast Crisis",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D004342",
+					"className": "Drug Hypersensitivity",
+					"classType": "DISEASE"
+				},
+				"rela": "ci_with",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D005770",
+					"className": "Gastrointestinal Neoplasms",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D007945",
+					"className": "Leukemia, Lymphoid",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D007951",
+					"className": "Leukemia, Myeloid",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D011247",
+					"className": "Pregnancy",
+					"classType": "DISEASE"
+				},
+				"rela": "ci_with",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D015465",
+					"className": "Leukemia, Myeloid, Accelerated Phase",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D017681",
+					"className": "Hypereosinophilic Syndrome",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D018223",
+					"className": "Dermatofibrosarcoma",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D034721",
+					"className": "Mastocytosis, Systemic",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "D054437",
+					"className": "Myelodysplastic-Myeloproliferative Diseases",
+					"classType": "DISEASE"
+				},
+				"rela": "may_treat",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "N0000008373",
+					"className": "Connective Tissue Alteration",
+					"classType": "PE"
+				},
+				"rela": "has_pe",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "N0000009689",
+					"className": "Increased T Lymphocyte Destruction",
+					"classType": "PE"
+				},
+				"rela": "has_pe",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "N0000020009",
+					"className": "Bcr-Abl Tyrosine Kinase Inhibitors",
+					"classType": "MOA"
+				},
+				"rela": "has_moa",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "284924",
+					"name": "imatinib mesylate",
+					"tty": "PIN"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "N0000175672",
+					"className": "Cellular Proliferation Alteration",
+					"classType": "PE"
+				},
+				"rela": "has_pe",
+				"relaSource": "MEDRT"
+			},
+			{
+				"minConcept": {
+					"rxcui": "403878",
+					"name": "imatinib 100 MG Oral Tablet",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "AN900",
+					"className": "ANTINEOPLASTIC,OTHER",
+					"classType": "VA"
+				},
+				"rela": "has_VAClass",
+				"relaSource": "VA"
+			},
+			{
+				"minConcept": {
+					"rxcui": "403878",
+					"name": "imatinib 100 MG Oral Tablet",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			},
+			{
+				"minConcept": {
+					"rxcui": "403879",
+					"name": "imatinib 400 MG Oral Tablet",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "AN900",
+					"className": "ANTINEOPLASTIC,OTHER",
+					"classType": "VA"
+				},
+				"rela": "has_VAClass",
+				"relaSource": "VA"
+			},
+			{
+				"minConcept": {
+					"rxcui": "403879",
+					"name": "imatinib 400 MG Oral Tablet",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			},
+			{
+				"minConcept": {
+					"rxcui": "404588",
+					"name": "imatinib 100 MG Oral Tablet [Gleevec]",
+					"tty": "SBD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "AN900",
+					"className": "ANTINEOPLASTIC,OTHER",
+					"classType": "VA"
+				},
+				"rela": "has_VAClass_extended",
+				"relaSource": "VA"
+			},
+			{
+				"minConcept": {
+					"rxcui": "404588",
+					"name": "imatinib 100 MG Oral Tablet [Gleevec]",
+					"tty": "SBD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			},
+			{
+				"minConcept": {
+					"rxcui": "404589",
+					"name": "imatinib 400 MG Oral Tablet [Gleevec]",
+					"tty": "SBD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "AN900",
+					"className": "ANTINEOPLASTIC,OTHER",
+					"classType": "VA"
+				},
+				"rela": "has_VAClass_extended",
+				"relaSource": "VA"
+			},
+			{
+				"minConcept": {
+					"rxcui": "404589",
+					"name": "imatinib 400 MG Oral Tablet [Gleevec]",
+					"tty": "SBD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			},
+			{
+				"minConcept": {
+					"rxcui": "411240",
+					"name": "imatinib 50 MG Oral Capsule",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			},
+			{
+				"minConcept": {
+					"rxcui": "483431",
+					"name": "imatinib 400 MG Oral Capsule",
+					"tty": "SCD"
+				},
+				"rxclassMinConceptItem": {
+					"classId": "L01EA",
+					"className": "BCR-ABL tyrosine kinase inhibitors",
+					"classType": "ATC1-4"
+				},
+				"rela": "",
+				"relaSource": "ATCPROD"
+			}
+		]
+	}
+}
