@@ -464,9 +464,7 @@ def _intify(value: str) -> int | None:
 
 def _make_datetime(value: str) -> datetime.datetime | None:
     try:
-        return datetime.datetime.strptime(value, "%Y%m%d").replace(
-            tzinfo=datetime.timezone.utc
-        )
+        return datetime.datetime.strptime(value, "%Y%m%d").replace(tzinfo=datetime.UTC)
     except ValueError:
         _logger.error("Unable to convert value '%s' to datetime", value)
         return None
