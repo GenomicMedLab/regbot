@@ -22,10 +22,10 @@ def test_fetch_clinical_trials(fixtures_dir: Path):
         (fixtures_dir / "fetch_clinical_trial_zolgensma.json").open() as json_response,
     ):
         m.get(
-            "https://clinicaltrials.gov/api/v2/studies?query.intr=zolgensma&pageSize=20",
+            "https://clinicaltrials.gov/api/v2/studies?query.intr=zolgensma",
             text=json_response.read(),
         )
-        results = get_clinical_trials(drug_name="zolgensma", page_size=20)
+        results = get_clinical_trials(drug_name="zolgensma")
     assert results
     example = results[2]
 
