@@ -71,7 +71,6 @@ class AgencyClass(StrEnum):
     AMBIG = "ambig"
     OTHER = "other"
     UNKNOWN = "unknown"
-    # TODO parts???
 
 
 def _format_protocol_id(id_input: dict) -> ProtocolIdentification:
@@ -685,6 +684,7 @@ def make_fda_clinical_trials_request(url: str) -> list[Study]:
 
     :param url: URL to request. This method doesn't add any additional parameters except
         for pagination.
+    :return: studies contained in API response
     """
     results = []
     next_page_token = None
@@ -709,17 +709,23 @@ def make_fda_clinical_trials_request(url: str) -> list[Study]:
     return results
 
 
-def get_clinical_trials(
-    drug_name: str | None = None, page_size: int | None = None
-) -> list[Study]:
-    """TODO"""
+def get_clinical_trials(drug_name: str | None = None) -> list[Study]:
+    """Get data from the FDA Clinical Trials API.
+
+    >>> results = get_clinical_trials("imatinib")
+    >>> results[0].protocol.identification.nct_id
+    'NCT00769782'
+
+    :param drug_name: name of drug used for trial intervention. This is passed to the
+        API intervention parameter, which appears to search for inclusion as a substring
+        rather than a full-span match
+    :return: list of matching trial descriptions
+    """
     if not drug_name:
         msg = "Must supply a query parameter like `drug_name`"
         raise ValueError(msg)
-    params = []
+    params = ["pageSize=50"]
     if drug_name:
         params.append(f"query.intr={drug_name}")
-    if page_size:
-        params.append(f"pageSize={page_size}")
     url = f"https://clinicaltrials.gov/api/v2/studies?{'&'.join(params)}"
     return make_fda_clinical_trials_request(url)
