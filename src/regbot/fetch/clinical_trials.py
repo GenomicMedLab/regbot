@@ -3,6 +3,41 @@
 See
 * API description: https://clinicaltrials.gov/data-api/api
 * Bioregistry entry: https://bioregistry.io/registry/clinicaltrials
+
+
+..code-block:: pycon
+
+    >>> results = get_clinical_trials("imatinib")
+    >>> results[0].protocol.identification.nct_id
+    'clinicaltrials:NCT00769782'
+    >>> len(results)
+    755
+
+Filter studies by age criteria:
+
+..code-block:: pycon
+
+    >>> import datetime
+    >>> ped_age = datetime.timedelta(365 * 24 * 60 * 60 * 18)
+    >>> pediatric_studies = [
+    ...     r
+    ...     for r in results
+    ...     if r.protocol.eligibility
+    ...     and r.protocol.eligibility.max_age
+    ...     and r.protocol.eligibility.max_age < ped_age
+    ... ]
+
+Get all serious adverse events:
+
+.. code-block:: pycon
+
+    >>> serious_events = []
+    >>> for r in results:
+    >>>     if f.results and r.results.adverse_events and r.results.adverse_events.serious_events:
+    >>>          serious_events.append(event.term)
+    >>> serious_events[:3]
+    ['ANAEMIA', 'AUTOIMMUNE HAEMOLYTIC ANAEMIA', 'EVANS SYNDROME']
+
 """
 
 import datetime
@@ -529,6 +564,31 @@ class StandardAge(StrEnum):
     OLDER_ADULT = "older_adult"
 
 
+# these are obviously imprecise, to varying degrees, but it's what we have to work with
+_SECONDS_IN_DAY = 24 * 60 * 60
+_SECONDS_IN_MONTH = 31 * _SECONDS_IN_DAY
+_SECONDS_IN_YEAR = 365 * _SECONDS_IN_DAY
+
+
+def _age_to_timedelta(raw_age: str) -> datetime.timedelta:
+    """Reformat age as a timedelta object
+
+    :param raw_age: raw string description:
+    :return: age as time delta
+    """
+    num = int(raw_age.split(" ", 1)[0])
+    if "Year" in raw_age:
+        factor = _SECONDS_IN_YEAR
+    elif "Month" in raw_age:
+        factor = _SECONDS_IN_MONTH
+    elif "Day" in raw_age:
+        factor = _SECONDS_IN_DAY
+    else:
+        msg = f"Unable to parse '{raw_age}' as a duration"
+        raise ValueError(msg)
+    return datetime.timedelta(seconds=factor * num)
+
+
 def _format_eligibility(elig_input: dict) -> Eligibility:
     """Format ProtocolSection.EligibilityModule
 
@@ -537,9 +597,19 @@ def _format_eligibility(elig_input: dict) -> Eligibility:
     :param elig_input: raw JSON
     :return: structured data
     """
+    min_age = (
+        _age_to_timedelta(elig_input["minimumAge"])
+        if "minimumAge" in elig_input
+        else None
+    )
+    max_age = (
+        _age_to_timedelta(elig_input["maximumAge"])
+        if "maximumAge" in elig_input
+        else None
+    )
     return Eligibility(
-        min_age=elig_input.get("minimumAge"),
-        max_age=elig_input.get("maximumAge"),
+        min_age=min_age,
+        max_age=max_age,
         std_age=[StandardAge(a.lower()) for a in elig_input["stdAges"]]
         if "stdAges" in elig_input
         else None,
@@ -695,7 +765,9 @@ AdverseEvents = namedtuple(
 
 
 def _format_event(event_input: dict) -> AdverseEvent:
-    """:param event_input: raw JSON
+    """Format adverse event
+
+    :param event_input: raw JSON
     :return: Structured data
     """
     return AdverseEvent(
