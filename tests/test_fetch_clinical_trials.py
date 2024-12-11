@@ -29,7 +29,7 @@ def test_fetch_clinical_trials(fixtures_dir: Path):
     assert results
     example = results[2]
 
-    assert example.protocol.identification.nct_id == "NCT05386680"
+    assert example.protocol.identification.nct_id == "clinicaltrials:NCT05386680"
     assert example.protocol.identification.org_id.id == "COAV101B12302"
     assert (
         example.protocol.sponsor_collaborators.lead_sponsor_name

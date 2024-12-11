@@ -19,25 +19,29 @@ _logger = logging.getLogger(__name__)
 
 
 def _get_dt_object(raw_date: str) -> datetime.datetime:
-    """Extract datetime object from raw date."""
+    """Extract datetime object from raw date.
+
+    :param raw_date: raw string from JSON response
+    :return: structured datetime instance depending on available data
+    """
     try:
         return datetime.datetime.strptime(raw_date, "%Y-%m-%d").replace(
             tzinfo=datetime.UTC
         )
     except ValueError:
-        pass
-    try:
-        return datetime.datetime.strptime(raw_date, "%Y-%m").replace(
-            tzinfo=datetime.UTC
-        )
-    except ValueError:
-        pass
-    try:
-        return datetime.datetime.strptime(raw_date, "%Y").replace(tzinfo=datetime.UTC)
-    except ValueError as e:
-        msg = f"Unable to format {raw_date} as YYYY-MM-DD, YYYY-MM, or YYYY"
-        _logger.error(msg)
-        raise ValueError(msg) from e
+        try:
+            return datetime.datetime.strptime(raw_date, "%Y-%m").replace(
+                tzinfo=datetime.UTC
+            )
+        except ValueError:
+            try:
+                return datetime.datetime.strptime(raw_date, "%Y").replace(
+                    tzinfo=datetime.UTC
+                )
+            except ValueError as e:
+                msg = f"Unable to format {raw_date} as YYYY-MM-DD, YYYY-MM, or YYYY"
+                _logger.error(msg)
+                raise ValueError(msg) from e
 
 
 ProtocolIdentification = namedtuple(
@@ -74,6 +78,15 @@ class AgencyClass(StrEnum):
 
 
 def _format_protocol_id(id_input: dict) -> ProtocolIdentification:
+    """Format ProtocolSection.IdentificationModule
+
+    See
+    * https://clinicaltrials.gov/policy/protocol-definitions#identification
+    * https://clinicaltrials.gov/data-api/about-api/study-data-structure#IdentificationModule
+
+    :param id_input: raw module input
+    :return: structured output
+    """
     org_study_id_input = id_input.get("orgStudyIdInfo")
     if org_study_id_input:
         org_study_id = OrgStudyId(
@@ -94,7 +107,7 @@ def _format_protocol_id(id_input: dict) -> ProtocolIdentification:
     else:
         org_study_id, secondary_ids = None, None
     return ProtocolIdentification(
-        nct_id=id_input["nctId"],
+        nct_id=f"clinicaltrials:{id_input['nctId']}",
         nct_id_aliases=id_input.get("nctIdAlias"),
         org_id=org_study_id,
         secondary_org_ids=secondary_ids,
@@ -180,6 +193,11 @@ class DateType(StrEnum):
 
 
 def _format_protocol_status_dates(status_input: dict) -> ProtocolStatusDates:
+    """Structure dates from ProtocolSection.StatusModule
+
+    :param status_input: StatusModule JSON
+    :return: structured dates data
+    """
     if "primaryCompletionDateStruct" in status_input:
         primary_completion_date = _get_dt_object(
             status_input["primaryCompletionDateStruct"]["date"]
@@ -231,6 +249,15 @@ def _format_protocol_status_dates(status_input: dict) -> ProtocolStatusDates:
 
 
 def _format_status(status_input: dict) -> ProtocolStatus:
+    """Structure ProtocolSection.StatusModule
+
+    See
+    * https://clinicaltrials.gov/policy/protocol-definitions#status
+    * https://clinicaltrials.gov/data-api/about-api/study-data-structure#StatusModule
+
+    :param status_input: raw StatusModule input
+    :return: structured data
+    """
     expanded_access_info_input = status_input.get("expandedAccessInfo")
     expanded_access_info = (
         ExpandedAccessInfo(
@@ -264,6 +291,13 @@ SponsorCollaborators = namedtuple(
 
 
 def _format_sponsor_collaborators(spo_collab: dict) -> SponsorCollaborators:
+    """Format ProtocolSection.SponsorCollaboratorsModule
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#SponsorCollaboratorsModule
+
+    :param spo_collab: raw JSON
+    :return: structured output
+    """
     return SponsorCollaborators(
         lead_sponsor_name=spo_collab["leadSponsor"]["name"],
         lead_sponsor_class=AgencyClass(spo_collab["leadSponsor"]["class"].lower())
@@ -285,6 +319,13 @@ Oversight = namedtuple(
 
 
 def _format_oversight(oversight_input: dict) -> Oversight:
+    """Format ProtocolSection.OversightModule
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#OversightModule
+
+    :param oversight_input: raw JSON
+    :return: structured data
+    """
     return Oversight(
         has_dmc=oversight_input.get("oversightHasDmc"),
         is_fda_regulated_drug=oversight_input.get("isFdaRegulatedDrug"),
@@ -298,6 +339,13 @@ Description = namedtuple("Description", ("summary", "detailed"))
 
 
 def _format_description(descr_input: dict) -> Description:
+    """Format ProtocolSection.DescriptionModule
+
+    see https://clinicaltrials.gov/data-api/about-api/study-data-structure#DescriptionModule
+
+    :param descr_input: raw JSON
+    :return: structured output
+    """
     return Description(
         summary=descr_input.get("briefSummary"),
         detailed=descr_input.get("detailedDescription"),
@@ -363,6 +411,13 @@ Design = namedtuple("Design", ("study_type", "phases", "enrollment"))
 
 
 def _format_design(design_input: dict) -> Design:
+    """Format ProtocolSection.DesignModule
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#DesignModule
+
+    :param design_input: raw JSON
+    :return: structured data
+    """
     enrollment = (
         Enrollment(
             count=design_input["enrollmentInfo"].get("count"),
@@ -406,6 +461,13 @@ ArmsInterventions = namedtuple("ArmsInterventions", ("interventions"))
 
 
 def _format_arms_interventions(arms_ints_input: dict) -> ArmsInterventions:
+    """Format ProtocolSection.ArmsInterventionsModule
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#ArmsInterventionsModule
+
+    :param arms_ints_input: raw JSON
+    :return: structured data
+    """
     interventions = (
         [
             Intervention(
@@ -427,6 +489,13 @@ Outcomes = namedtuple("Outcomes", ("primary_outcomes", "secondary_outcomes"))
 
 
 def _format_outcomes(outcomes: dict) -> Outcomes:
+    """Format ProtocolSection.OutcomesModule
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#OutcomesModule
+
+    :param outcomes: raw JSON
+    :return: structured data
+    """
     primary = [
         Outcome(
             measure=po.get("measure"),
@@ -461,6 +530,13 @@ class StandardAge(StrEnum):
 
 
 def _format_eligibility(elig_input: dict) -> Eligibility:
+    """Format ProtocolSection.EligibilityModule
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#EligibilityModule
+
+    :param elig_input: raw JSON
+    :return: structured data
+    """
     return Eligibility(
         min_age=elig_input.get("minimumAge"),
         max_age=elig_input.get("maximumAge"),
@@ -487,6 +563,15 @@ Reference = namedtuple(
 
 
 def _format_reference(ref_input: dict) -> Reference:
+    """Format ProtocolSection.ReferencesModule.reference
+
+    See
+    * https://clinicaltrials.gov/data-api/about-api/study-data-structure#Reference
+    * https://clinicaltrials.gov/policy/protocol-definitions#RefCitations
+
+    :param ref_input: raw JSON
+    :return: structured data
+    """
     retraction_pmid, retraction_source = None, None
     if "retraction" in ref_input:
         retraction = ref_input["retraction"]
@@ -520,6 +605,15 @@ Protocol = namedtuple(
 
 
 def _format_protocol(protocol_input: dict) -> Protocol:
+    """Format ProtocolSection
+
+    See
+    * https://clinicaltrials.gov/policy/protocol-definitions
+    * https://clinicaltrials.gov/data-api/about-api/study-data-structure#protocolSection
+
+    :param protocol_input: raw JSON
+    :return: structured data
+    """
     conditions = (
         ProtocolConditions(
             conditions=protocol_input["conditionsModule"].get("conditions"),
@@ -601,6 +695,9 @@ AdverseEvents = namedtuple(
 
 
 def _format_event(event_input: dict) -> AdverseEvent:
+    """:param event_input: raw JSON
+    :return: Structured data
+    """
     return AdverseEvent(
         term=event_input.get("term"),
         organ_system=event_input.get("organSystem"),
@@ -624,6 +721,15 @@ def _format_event(event_input: dict) -> AdverseEvent:
 
 
 def _format_adverse_events(aes_input: dict) -> AdverseEvents:
+    """Format ResultsSection.AdverseEventsModule
+
+    See
+    * https://clinicaltrials.gov/data-api/about-api/study-data-structure#AdverseEventsModule
+    * https://clinicaltrials.gov/policy/results-definitions#Result_AdverseEvents
+
+    :param aes_input: raw JSON
+    :return: Structured data
+    """
     return AdverseEvents(
         frequency_threshold=aes_input.get("frequencyThreshold"),
         timeframe=aes_input.get("timeFrame"),
@@ -642,6 +748,13 @@ Results = namedtuple("Results", ("adverse_events"))
 
 
 def _format_results(results_input: dict) -> Results:
+    """Format ResultsSection
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#resultsSection
+
+    :param results_input: raw JSON
+    :return: structured data
+    """
     return Results(
         adverse_events=_format_adverse_events(results_input["adverseEventsModule"])
         if "adverseEventsModule" in results_input
@@ -654,6 +767,14 @@ Derived = namedtuple("Derived", ("conditions"))
 
 
 def _format_derived(der_input: dict) -> Derived:
+    """Format DerivedSection data
+
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#DerivedSection
+
+    :param der_input: raw JSON
+    :return: structured data
+    """
     return Derived(
         conditions=[
             MeshConcept(id=c.get("id"), term=c.get("term"))
@@ -668,6 +789,13 @@ Study = namedtuple("Study", ("protocol", "results", "derived"))
 
 
 def _format_study(study_input: dict) -> Study:
+    """Format a raw study JSON object received from the ClinicalTrials.gov API
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure
+
+    :param study_input: raw JSON
+    :return: Structured data
+    """
     return Study(
         protocol=_format_protocol(study_input["protocolSection"]),
         results=_format_results(study_input["resultsSection"])
