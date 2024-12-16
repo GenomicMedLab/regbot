@@ -47,3 +47,16 @@ def test_fetch_clinical_trials(fixtures_dir: Path):
     assert example.derived.conditions[0] == MeshConcept(
         id="D009133", term="Muscular Atrophy"
     )
+
+    with (
+        requests_mock.Mocker() as m,
+        (
+            fixtures_dir / "fetch_clinical_trial_zolgensma_parsing_error.json"
+        ).open() as json_response,
+    ):
+        m.get(
+            "https://clinicaltrials.gov/api/v2/studies?query.intr=zolgensma",
+            text=json_response.read(),
+        )
+        # check that parsing errors are skipped
+        results = get_clinical_trials(drug_name="zolgensma", skip_parsing_failures=True)

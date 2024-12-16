@@ -565,7 +565,10 @@ class StandardAge(StrEnum):
 
 
 # these are obviously imprecise, to varying degrees, but it's what we have to work with
-_SECONDS_IN_DAY = 24 * 60 * 60
+_SECONDS_IN_MINUTE = 60
+_SECONDS_IN_HOUR = 60 * _SECONDS_IN_MINUTE
+_SECONDS_IN_DAY = 24 * _SECONDS_IN_HOUR
+_SECONDS_IN_WEEK = 7 * _SECONDS_IN_DAY
 _SECONDS_IN_MONTH = 31 * _SECONDS_IN_DAY
 _SECONDS_IN_YEAR = 365 * _SECONDS_IN_DAY
 
@@ -581,8 +584,14 @@ def _age_to_timedelta(raw_age: str) -> datetime.timedelta:
         factor = _SECONDS_IN_YEAR
     elif "Month" in raw_age:
         factor = _SECONDS_IN_MONTH
+    elif "Week" in raw_age:
+        factor = _SECONDS_IN_WEEK
     elif "Day" in raw_age:
         factor = _SECONDS_IN_DAY
+    elif "Hour" in raw_age:
+        factor = _SECONDS_IN_HOUR
+    elif "Minute" in raw_age:
+        factor = _SECONDS_IN_MINUTE
     else:
         msg = f"Unable to parse '{raw_age}' as a duration"
         raise ValueError(msg)
@@ -879,11 +888,37 @@ def _format_study(study_input: dict) -> Study:
     )
 
 
-def make_fda_clinical_trials_request(url: str) -> list[Study]:
+def _get_id(study_response: dict, url: str, i: int) -> str | None:
+    """Extract NCT ID from study response
+
+    :param study_response: a single study response object
+    :param url: URL used to issue request
+    :param i: index of individual study within response to that URL
+    :return: NCT ID if available (should be, but we're being careful)
+    """
+    study_id = (
+        study_response.get("protocolSection", {})
+        .get("identificationModule", {})
+        .get("nctId")
+    )
+    if not study_id:
+        _logger.error(
+            "Unable to fetch study ID for the %s 'th entry in %s. Is the JSON object malformed?",
+            i,
+            url,
+        )
+    return study_id
+
+
+def make_fda_clinical_trials_request(
+    url: str, skip_parsing_failures: bool
+) -> list[Study]:
     """Issue a request against provided URL for FDA Clinical Trials API
 
     :param url: URL to request. This method doesn't add any additional parameters except
         for pagination.
+    :param skip_parsing_failures: if ``True``, catch and suppress failures to parse
+        study metadata
     :return: studies contained in API response
     """
     results = []
@@ -899,9 +934,16 @@ def make_fda_clinical_trials_request(url: str) -> list[Study]:
                 )
                 raise e
             raw_data = r.json()
-            results.extend(
-                _format_study(study) for study in raw_data.get("studies", [])
-            )
+            for i, study in enumerate(raw_data.get("studies", [])):
+                try:
+                    parsed_data = _format_study(study)
+                except ValueError as e:
+                    if skip_parsing_failures:
+                        nct_id = _get_id(study, formatted_url, i)
+                        _logger.warning("Failed to parse study %s: %s", nct_id, e)
+                        continue
+                    raise e
+                results.append(parsed_data)
 
             next_page_token = raw_data.get("nextPageToken")
             if not next_page_token:
@@ -909,7 +951,9 @@ def make_fda_clinical_trials_request(url: str) -> list[Study]:
     return results
 
 
-def get_clinical_trials(drug_name: str | None = None) -> list[Study]:
+def get_clinical_trials(
+    drug_name: str | None = None, skip_parsing_failures: bool = False
+) -> list[Study]:
     """Get data from the FDA Clinical Trials API.
 
     >>> results = get_clinical_trials("imatinib")
@@ -919,6 +963,7 @@ def get_clinical_trials(drug_name: str | None = None) -> list[Study]:
     :param drug_name: name of drug used for trial intervention. This is passed to the
         API intervention parameter, which appears to search for inclusion as a substring
         rather than a full-span match
+    :param skip_parsing_failures: if ``True``
     :return: list of matching trial descriptions
     """
     if not drug_name:
@@ -928,4 +973,4 @@ def get_clinical_trials(drug_name: str | None = None) -> list[Study]:
     if drug_name:
         params.append(f"query.intr={drug_name}")
     url = f"https://clinicaltrials.gov/api/v2/studies?{'&'.join(params)}"
-    return make_fda_clinical_trials_request(url)
+    return make_fda_clinical_trials_request(url, skip_parsing_failures)
