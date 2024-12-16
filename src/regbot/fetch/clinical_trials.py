@@ -889,6 +889,13 @@ def _format_study(study_input: dict) -> Study:
 
 
 def _get_id(study_response: dict, url: str, i: int) -> str | None:
+    """Extract NCT ID from study response
+
+    :param study_response: a single study response object
+    :param url: URL used to issue request
+    :param i: index of individual study within response to that URL
+    :return: NCT ID if available (should be, but we're being careful)
+    """
     study_id = (
         study_response.get("protocolSection", {})
         .get("identificationModule", {})
@@ -900,7 +907,6 @@ def _get_id(study_response: dict, url: str, i: int) -> str | None:
             i,
             url,
         )
-        study_id = "<ID lookup failed>"
     return study_id
 
 
