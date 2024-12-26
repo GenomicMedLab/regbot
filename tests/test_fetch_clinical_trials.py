@@ -5,6 +5,7 @@ import pytest
 import requests_mock
 
 from regbot.fetch.clinical_trials import (
+    CandidateSex,
     InterventionType,
     MeshConcept,
     Status,
@@ -44,6 +45,9 @@ def test_fetch_clinical_trials(fixtures_dir: Path):
         example.protocol.arms_intervention.interventions[0].type
         == InterventionType.GENETIC
     )
+    assert "SMA diagnosis" in example.protocol.eligibility.description
+    assert example.protocol.eligibility.accepts_healthy is False
+    assert example.protocol.eligibility.sex == CandidateSex.ALL
     assert example.derived.conditions[0] == MeshConcept(
         id="D009133", term="Muscular Atrophy"
     )

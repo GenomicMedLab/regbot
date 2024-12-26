@@ -550,7 +550,20 @@ def _format_outcomes(outcomes: dict) -> Outcomes:
     return Outcomes(primary_outcomes=primary, secondary_outcomes=secondary)
 
 
-Eligibility = namedtuple("Eligibility", ("min_age", "max_age", "std_age"))
+Eligibility = namedtuple(
+    "Eligibility",
+    (
+        "min_age",
+        "max_age",
+        "std_age",
+        "description",
+        "accepts_healthy",
+        "sex",
+        "gender_based",
+        "gender_description",
+        "population",
+    ),
+)
 
 
 class StandardAge(StrEnum):
@@ -598,6 +611,17 @@ def _age_to_timedelta(raw_age: str) -> datetime.timedelta:
     return datetime.timedelta(seconds=factor * num)
 
 
+class CandidateSex(StrEnum):
+    """Sex of a participant in a study
+
+    https://clinicaltrials.gov/data-api/about-api/study-data-structure#enum-Sex
+    """
+
+    FEMALE = "female"
+    MALE = "male"
+    ALL = "all"
+
+
 def _format_eligibility(elig_input: dict) -> Eligibility:
     """Format ProtocolSection.EligibilityModule
 
@@ -622,6 +646,14 @@ def _format_eligibility(elig_input: dict) -> Eligibility:
         std_age=[StandardAge(a.lower()) for a in elig_input["stdAges"]]
         if "stdAges" in elig_input
         else None,
+        description=elig_input.get("eligibilityCriteria"),
+        accepts_healthy=elig_input.get("healthyVolunteers"),
+        sex=CandidateSex(elig_input["sex"].lower()) if elig_input.get("sex") else None,
+        # distinction between gender and sex here -- these fields are for self-ID of gender
+        # https://clinicaltrials.gov/policy/protocol-definitions#GenderDescription
+        gender_based=elig_input.get("genderBased"),
+        gender_description=elig_input.get("genderDescription"),
+        population=elig_input.get("studyPopulation"),
     )
 
 
