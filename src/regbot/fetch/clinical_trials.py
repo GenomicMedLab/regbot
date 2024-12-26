@@ -44,6 +44,7 @@ import datetime
 import logging
 from collections import namedtuple
 from enum import StrEnum
+from typing import NamedTuple
 
 import requests
 from requests.exceptions import RequestException
@@ -550,9 +551,6 @@ def _format_outcomes(outcomes: dict) -> Outcomes:
     return Outcomes(primary_outcomes=primary, secondary_outcomes=secondary)
 
 
-Eligibility = namedtuple("Eligibility", ("min_age", "max_age", "std_age"))
-
-
 class StandardAge(StrEnum):
     """Define possible standardized age group values.
 
@@ -562,6 +560,17 @@ class StandardAge(StrEnum):
     CHILD = "child"
     ADULT = "adult"
     OLDER_ADULT = "older_adult"
+
+
+class Eligibility(NamedTuple):
+    """Describe eligibility for study
+
+    https://clinicaltrials.gov/data-api/about-api/study-data-structure#EligibilityModule
+    """
+
+    min_age: datetime.timedelta
+    max_age: datetime.timedelta
+    std_age: StandardAge
 
 
 # these are obviously imprecise, to varying degrees, but it's what we have to work with
