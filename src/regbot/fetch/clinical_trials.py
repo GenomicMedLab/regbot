@@ -683,7 +683,7 @@ class ContactsLocationData(NamedTuple):
 def _format_locations(loc_input: dict) -> ContactsLocationData:
     """Extract data from contactsLocations module
 
-    :param input: raw protocolSection.contactsLocationsModule object
+    :param loc_input: raw protocolSection.contactsLocationsModule object
     :return: completed location data description
     """
     locations = []
