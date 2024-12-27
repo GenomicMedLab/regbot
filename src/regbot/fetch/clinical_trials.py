@@ -44,6 +44,7 @@ import datetime
 import logging
 from collections import namedtuple
 from enum import StrEnum
+from typing import NamedTuple
 
 import requests
 from requests.exceptions import RequestException
@@ -657,6 +658,51 @@ def _format_eligibility(elig_input: dict) -> Eligibility:
     )
 
 
+class Location(NamedTuple):
+    """Define data object for an individual location (i.e. for a trial site)."""
+
+    facility: str | None
+    status: Status | None
+    city: str | None
+    state_province: str | None
+    postal_code: str | None
+    country: str | None
+    # (latitude, longitude)
+    geo: tuple[float, float] | None
+
+
+class LocationData(NamedTuple):
+    """Define data object for a the contacts-locations module
+
+    https://clinicaltrials.gov/data-api/about-api/study-data-structure#ContactsLocationsModule
+    """
+
+    locations: list[Location]
+
+
+def _format_locations(loc_input: dict) -> LocationData:
+    """Extract data from contactsLocations module
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#ContactsLocationsModule
+    """
+    locations = []
+    for i in loc_input.get("locations", []):
+        locations.append(  # noqa: PERF401
+            Location(
+                facility=i.get("locationFacility"),
+                status=Status(i["locationStatus"]) if i.get("locationStatus") else None,
+                city=i.get("locationCity"),
+                state_province=i.get("locationState"),
+                postal_code=i.get("locationZip"),
+                country=i.get("locationCountry"),
+                geo=(i["geoPoint"]["lat"], i["geoPoint"]["long"])
+                if i.get("geoPoint")
+                else None,
+            )
+        )
+    return LocationData(locations=locations)
+
+
 class ReferenceType(StrEnum):
     """Define possible reference types.
 
@@ -710,6 +756,7 @@ Protocol = namedtuple(
         "arms_intervention",
         "outcomes",
         "eligibility",
+        "locations",
         "references",
     ),
 )
@@ -765,6 +812,9 @@ def _format_protocol(protocol_input: dict) -> Protocol:
         else None,
         eligibility=_format_eligibility(protocol_input["eligibilityModule"])
         if "eligibilityModule" in protocol_input
+        else None,
+        locations=_format_locations(protocol_input["contactsLocationsModule"])
+        if "contactsLocationsModule" in protocol_input
         else None,
         references=[
             _format_reference(r)
