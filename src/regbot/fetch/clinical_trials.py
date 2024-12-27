@@ -671,7 +671,7 @@ class Location(NamedTuple):
     geo: tuple[float, float] | None
 
 
-class LocationData(NamedTuple):
+class ContactsLocationData(NamedTuple):
     """Define data object for a the contacts-locations module
 
     https://clinicaltrials.gov/data-api/about-api/study-data-structure#ContactsLocationsModule
@@ -680,27 +680,28 @@ class LocationData(NamedTuple):
     locations: list[Location]
 
 
-def _format_locations(loc_input: dict) -> LocationData:
+def _format_locations(loc_input: dict) -> ContactsLocationData:
     """Extract data from contactsLocations module
 
-    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#ContactsLocationsModule
+    :param input: raw protocolSection.contactsLocationsModule object
+    :return: completed location data description
     """
     locations = []
     for i in loc_input.get("locations", []):
         locations.append(  # noqa: PERF401
             Location(
-                facility=i.get("locationFacility"),
-                status=Status(i["locationStatus"]) if i.get("locationStatus") else None,
-                city=i.get("locationCity"),
-                state_province=i.get("locationState"),
-                postal_code=i.get("locationZip"),
-                country=i.get("locationCountry"),
-                geo=(i["geoPoint"]["lat"], i["geoPoint"]["long"])
+                facility=i.get("facility"),
+                status=Status(i["status"].lower()) if i.get("status") else None,
+                city=i.get("city"),
+                state_province=i.get("state"),
+                postal_code=i.get("zip"),
+                country=i.get("country"),
+                geo=(i["geoPoint"]["lat"], i["geoPoint"]["lon"])
                 if i.get("geoPoint")
                 else None,
             )
         )
-    return LocationData(locations=locations)
+    return ContactsLocationData(locations=locations)
 
 
 class ReferenceType(StrEnum):
@@ -756,7 +757,7 @@ Protocol = namedtuple(
         "arms_intervention",
         "outcomes",
         "eligibility",
-        "locations",
+        "contacts_locations",
         "references",
     ),
 )
@@ -813,7 +814,7 @@ def _format_protocol(protocol_input: dict) -> Protocol:
         eligibility=_format_eligibility(protocol_input["eligibilityModule"])
         if "eligibilityModule" in protocol_input
         else None,
-        locations=_format_locations(protocol_input["contactsLocationsModule"])
+        contacts_locations=_format_locations(protocol_input["contactsLocationsModule"])
         if "contactsLocationsModule" in protocol_input
         else None,
         references=[
