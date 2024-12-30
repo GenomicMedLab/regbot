@@ -38,11 +38,13 @@ Get all serious adverse events:
     >>> serious_events[:3]
     ['ANAEMIA', 'AUTOIMMUNE HAEMOLYTIC ANAEMIA', 'EVANS SYNDROME']
 
+The schema elements are structured as standard-library NamedTuple classes. This is done
+to provide very basic name-completion and type annotation, without being wedded to a
+particular schema library like Pydantic (though this could change in the future).
 """
 
 import datetime
 import logging
-from collections import namedtuple
 from enum import StrEnum
 from typing import NamedTuple
 
@@ -80,22 +82,6 @@ def _get_dt_object(raw_date: str) -> datetime.datetime:
                 raise ValueError(msg) from e
 
 
-ProtocolIdentification = namedtuple(
-    "ProtocolIdentification",
-    (
-        "nct_id",
-        "nct_id_aliases",
-        "org_id",
-        "secondary_org_ids",
-        "brief_title",
-        "official_title",
-        "organization",
-    ),
-)
-Organization = namedtuple("Organization", ("full_name", "org_class"))
-OrgStudyId = namedtuple("OrgStudyId", ("id", "id_type", "link", "domain"))
-
-
 class AgencyClass(StrEnum):
     """Define valid agency class descriptions
 
@@ -113,6 +99,34 @@ class AgencyClass(StrEnum):
     UNKNOWN = "unknown"
 
 
+class Organization(NamedTuple):
+    """Define data structure for trial organization"""
+
+    full_name: str | None
+    org_class: AgencyClass | None
+
+
+class OrgStudyId(NamedTuple):
+    """Define study ID data structure"""
+
+    id: str | None
+    id_type: str | None
+    link: str | None
+    domain: str | None
+
+
+class ProtocolIdentification(NamedTuple):
+    """Define data structure for ID module in protocol section."""
+
+    nct_id: str
+    nct_id_aliases: list[str] | None
+    org_id: OrgStudyId | None
+    secondary_org_ids: list[OrgStudyId] | None
+    brief_title: str | None
+    official_title: str | None
+    organization: Organization | None
+
+
 def _format_protocol_id(id_input: dict) -> ProtocolIdentification:
     """Format ProtocolSection.IdentificationModule
 
@@ -127,18 +141,18 @@ def _format_protocol_id(id_input: dict) -> ProtocolIdentification:
     if org_study_id_input:
         org_study_id = OrgStudyId(
             id=org_study_id_input["id"],
-            id_type=org_study_id_input.get("orgStudyIdType"),
-            link=org_study_id_input.get("orgStudyIdLink"),
-            domain=org_study_id_input.get(""),
+            id_type=org_study_id_input.get("type"),
+            link=org_study_id_input.get("link"),
+            domain=org_study_id_input.get("domain"),
         )
         secondary_ids = [
             OrgStudyId(
-                id=secondary["secondaryId"],
-                id_type=secondary["secondaryIdType"],
-                link=secondary["secondaryIdLink"],
-                domain=secondary["secondaryIdDomain"],
+                id=secondary["id"],
+                id_type=secondary["type"],
+                link=secondary["link"],
+                domain=secondary["domain"],
             )
-            for secondary in org_study_id_input.get("secondaryIdInfo", [])
+            for secondary in org_study_id_input.get("secondaryIdInfos", [])
         ]
     else:
         org_study_id, secondary_ids = None, None
@@ -180,42 +194,12 @@ class Status(StrEnum):
     UNKNOWN = "unknown"
 
 
-ProtocolStatus = namedtuple(
-    "ProtocolStatus",
-    (
-        "overall_status",
-        "last_known_status",
-        "delayed_posting",
-        "why_stopped",
-        "expanded_access_info",
-        "dates",
-        "results_waived",
-    ),
-)
+class ExpandedAccessInfo(NamedTuple):
+    """Define data structure for expanded access info module"""
 
-ExpandedAccessInfo = namedtuple(
-    "ExpandedAccessInfo",
-    (
-        "has_expanded_access",
-        "nct_id",
-        "status_for_nct_id",
-    ),
-)
-
-ProtocolStatusDates = namedtuple(
-    "ProtocolStatusDates",
-    (
-        "start_date",
-        "start_date_type",
-        "primary_completion_date",
-        "primary_completion_date_type",
-        "completion_date",
-        "completion_date_type",
-        "study_first_submit_date",
-        "results_first_submit_date",
-        "last_update_submit_date",
-    ),
-)
+    has_expanded_access: bool | None
+    nct_id: str | None
+    status_for_nct_id: str | None
 
 
 class DateType(StrEnum):
@@ -226,6 +210,32 @@ class DateType(StrEnum):
 
     ACTUAL = "actual"
     ESTIMATED = "estimated"
+
+
+class ProtocolStatusDates(NamedTuple):
+    """Define data structure for status dates of protocol"""
+
+    start_date: datetime.datetime | None
+    start_date_type: DateType | None
+    primary_completion_date: datetime.datetime | None
+    primary_completion_date_type: DateType | None
+    completion_date: datetime.datetime | None
+    completion_date_type: DateType | None
+    study_first_submit_date: datetime.datetime | None
+    results_first_submit_date: datetime.datetime | None
+    last_update_submit_date: datetime.datetime | None
+
+
+class ProtocolStatus(NamedTuple):
+    """Define data structure for protocol status module"""
+
+    overall_status: Status | None
+    last_known_status: Status | None
+    delayed_posting: bool | None
+    why_stopped: str | None
+    expanded_access_info: ExpandedAccessInfo | None
+    dates: ProtocolStatusDates | None
+    results_waived: bool | None
 
 
 def _format_protocol_status_dates(status_input: dict) -> ProtocolStatusDates:
@@ -321,9 +331,11 @@ def _format_status(status_input: dict) -> ProtocolStatus:
     )
 
 
-SponsorCollaborators = namedtuple(
-    "SponsorCollaborators", ("lead_sponsor_name", "lead_sponsor_class")
-)
+class SponsorCollaborators(NamedTuple):
+    """Define data structure for sponsor-collaborators module"""
+
+    lead_sponsor_name: str | None
+    lead_sponsor_class: AgencyClass | None
 
 
 def _format_sponsor_collaborators(spo_collab: dict) -> SponsorCollaborators:
@@ -342,16 +354,14 @@ def _format_sponsor_collaborators(spo_collab: dict) -> SponsorCollaborators:
     )
 
 
-Oversight = namedtuple(
-    "Oversight",
-    (
-        "has_dmc",
-        "is_fda_regulated_drug",
-        "is_fda_regulated_device",
-        "is_unapproved_device",
-        "is_ppsd",
-    ),
-)
+class Oversight(NamedTuple):
+    """Define data structure for oversight module"""
+
+    has_dmc: bool | None
+    is_fda_regulated_drug: bool | None
+    is_fda_regulated_device: bool | None
+    is_unapproved_device: bool | None
+    is_ppsd: bool | None
 
 
 def _format_oversight(oversight_input: dict) -> Oversight:
@@ -371,10 +381,14 @@ def _format_oversight(oversight_input: dict) -> Oversight:
     )
 
 
-Description = namedtuple("Description", ("summary", "detailed"))
+class ProtocolDescription(NamedTuple):
+    """Define data structure for protocol section description module"""
+
+    summary: str | None
+    detailed: str | None
 
 
-def _format_description(descr_input: dict) -> Description:
+def _format_protocol_description(descr_input: dict) -> ProtocolDescription:
     """Format ProtocolSection.DescriptionModule
 
     see https://clinicaltrials.gov/data-api/about-api/study-data-structure#DescriptionModule
@@ -382,16 +396,34 @@ def _format_description(descr_input: dict) -> Description:
     :param descr_input: raw JSON
     :return: structured output
     """
-    return Description(
+    return ProtocolDescription(
         summary=descr_input.get("briefSummary"),
         detailed=descr_input.get("detailedDescription"),
     )
 
 
-ProtocolConditions = namedtuple("ProtocolConditions", ("conditions", "keywords"))
+class ProtocolConditions(NamedTuple):
+    """Define data structure for conditions related to study"""
+
+    conditions: list[str] | None
+    keywords: list[str] | None
 
 
-Enrollment = namedtuple("Enrollment", ("count", "type"))
+class EnrollmentType(StrEnum):
+    """Define valid enrollment type terms
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#enum-EnrollmentType
+    """
+
+    ACTUAL = "actual"
+    ESTIMATED = "estimated"
+
+
+class Enrollment(NamedTuple):
+    """Define data structure for protocol enrollment description"""
+
+    enrollment_count: int | None
+    type: EnrollmentType | None
 
 
 class StudyType(StrEnum):
@@ -433,20 +465,15 @@ class StudyPhase(StrEnum):
         )
 
 
-class EnrollmentType(StrEnum):
-    """Define valid enrollment type terms
+class ProtocolDesign(NamedTuple):
+    """Define data structure for design module in protocol section"""
 
-    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#enum-EnrollmentType
-    """
-
-    ACTUAL = "actual"
-    ESTIMATED = "estimated"
+    study_type: StudyType
+    phases: list[StudyPhase] | None
+    enrollment: Enrollment | None
 
 
-Design = namedtuple("Design", ("study_type", "phases", "enrollment"))
-
-
-def _format_design(design_input: dict) -> Design:
+def _format_design(design_input: dict) -> ProtocolDesign:
     """Format ProtocolSection.DesignModule
 
     See https://clinicaltrials.gov/data-api/about-api/study-data-structure#DesignModule
@@ -456,7 +483,7 @@ def _format_design(design_input: dict) -> Design:
     """
     enrollment = (
         Enrollment(
-            count=design_input["enrollmentInfo"].get("count"),
+            enrollment_count=design_input["enrollmentInfo"].get("count"),
             type=EnrollmentType(design_input["enrollmentInfo"]["type"].lower())
             if "type" in design_input["enrollmentInfo"]
             else None,
@@ -464,7 +491,7 @@ def _format_design(design_input: dict) -> Design:
         if "enrollmentInfo" in design_input
         else None
     )
-    return Design(
+    return ProtocolDesign(
         study_type=StudyType(design_input["studyType"].lower()),
         phases=[StudyPhase(p.lower()) for p in design_input["phases"]]
         if "phases" in design_input
@@ -492,8 +519,19 @@ class InterventionType(StrEnum):
     OTHER = "other"
 
 
-Intervention = namedtuple("Intervention", ("type", "name", "description", "aliases"))
-ArmsInterventions = namedtuple("ArmsInterventions", ("interventions"))
+class Intervention(NamedTuple):
+    """Define data structure for an individual intervention description"""
+
+    type: InterventionType | None
+    name: str | None
+    description: str | None
+    aliases: list[str] | None
+
+
+class ArmsInterventions(NamedTuple):
+    """Define data structure for protocol section Arms-Interventions module"""
+
+    interventions: list[Intervention] | None
 
 
 def _format_arms_interventions(arms_ints_input: dict) -> ArmsInterventions:
@@ -520,8 +558,19 @@ def _format_arms_interventions(arms_ints_input: dict) -> ArmsInterventions:
     return ArmsInterventions(interventions=interventions)
 
 
-Outcome = namedtuple("Outcome", ("measure", "description", "timeframe"))
-Outcomes = namedtuple("Outcomes", ("primary_outcomes", "secondary_outcomes"))
+class Outcome(NamedTuple):
+    """Define data structure for an individual primary or secondary outcome"""
+
+    measure: str | None
+    description: str | None
+    timeframe: str | None
+
+
+class Outcomes(NamedTuple):
+    """Define data structure for protocol outcomes module"""
+
+    primary_outcomes: list[Outcome] | None
+    secondary_outcomes: list[Outcome] | None
 
 
 def _format_outcomes(outcomes: dict) -> Outcomes:
@@ -562,17 +611,6 @@ class StandardAge(StrEnum):
     OLDER_ADULT = "older_adult"
 
 
-class Eligibility(NamedTuple):
-    """Describe eligibility for study
-
-    https://clinicaltrials.gov/data-api/about-api/study-data-structure#EligibilityModule
-    """
-
-    min_age: datetime.timedelta
-    max_age: datetime.timedelta
-    std_age: StandardAge
-
-
 # these are obviously imprecise, to varying degrees, but it's what we have to work with
 _SECONDS_IN_MINUTE = 60
 _SECONDS_IN_HOUR = 60 * _SECONDS_IN_MINUTE
@@ -607,6 +645,34 @@ def _age_to_timedelta(raw_age: str) -> datetime.timedelta:
     return datetime.timedelta(seconds=factor * num)
 
 
+class CandidateSex(StrEnum):
+    """Sex of a participant in a study
+
+    https://clinicaltrials.gov/data-api/about-api/study-data-structure#enum-Sex
+    """
+
+    FEMALE = "female"
+    MALE = "male"
+    ALL = "all"
+
+
+class Eligibility(NamedTuple):
+    """Describe eligibility for study
+
+    https://clinicaltrials.gov/data-api/about-api/study-data-structure#EligibilityModule
+    """
+
+    min_age: datetime.timedelta | None
+    max_age: datetime.timedelta | None
+    std_age: list[StandardAge] | None
+    description: str | None
+    accepts_healthy: bool | None
+    sex: CandidateSex | None
+    gender_based: bool | None
+    gender_description: str | None
+    population: str | None
+
+
 def _format_eligibility(elig_input: dict) -> Eligibility:
     """Format ProtocolSection.EligibilityModule
 
@@ -631,7 +697,61 @@ def _format_eligibility(elig_input: dict) -> Eligibility:
         std_age=[StandardAge(a.lower()) for a in elig_input["stdAges"]]
         if "stdAges" in elig_input
         else None,
+        description=elig_input.get("eligibilityCriteria"),
+        accepts_healthy=elig_input.get("healthyVolunteers"),
+        sex=CandidateSex(elig_input["sex"].lower()) if elig_input.get("sex") else None,
+        # distinction between gender and sex here -- these fields are for self-ID of gender
+        # https://clinicaltrials.gov/policy/protocol-definitions#GenderDescription
+        gender_based=elig_input.get("genderBased"),
+        gender_description=elig_input.get("genderDescription"),
+        population=elig_input.get("studyPopulation"),
     )
+
+
+class Location(NamedTuple):
+    """Define data object for an individual location (i.e. for a trial site)."""
+
+    facility: str | None
+    status: Status | None
+    city: str | None
+    state_province: str | None
+    postal_code: str | None
+    country: str | None
+    # (latitude, longitude)
+    geo: tuple[float, float] | None
+
+
+class ContactsLocationData(NamedTuple):
+    """Define data object for a the contacts-locations module
+
+    https://clinicaltrials.gov/data-api/about-api/study-data-structure#ContactsLocationsModule
+    """
+
+    locations: list[Location]
+
+
+def _format_locations(loc_input: dict) -> ContactsLocationData:
+    """Extract data from contactsLocations module
+
+    :param loc_input: raw protocolSection.contactsLocationsModule object
+    :return: completed location data description
+    """
+    locations = []
+    for i in loc_input.get("locations", []):
+        locations.append(  # noqa: PERF401
+            Location(
+                facility=i.get("facility"),
+                status=Status(i["status"].lower()) if i.get("status") else None,
+                city=i.get("city"),
+                state_province=i.get("state"),
+                postal_code=i.get("zip"),
+                country=i.get("country"),
+                geo=(i["geoPoint"]["lat"], i["geoPoint"]["lon"])
+                if i.get("geoPoint")
+                else None,
+            )
+        )
+    return ContactsLocationData(locations=locations)
 
 
 class ReferenceType(StrEnum):
@@ -645,12 +765,17 @@ class ReferenceType(StrEnum):
     DERIVED = "derived"
 
 
-Reference = namedtuple(
-    "Reference", ("pmid", "type", "citation", "retraction_pmid", "retraction_source")
-)
+class ProtocolReference(NamedTuple):
+    """Define data structure for protocol reference module"""
+
+    pmid: str | None
+    type: ReferenceType | None
+    citation: str | None
+    retraction_pmid: str | None
+    retraction_source: str | None
 
 
-def _format_reference(ref_input: dict) -> Reference:
+def _format_reference(ref_input: dict) -> ProtocolReference:
     """Format ProtocolSection.ReferencesModule.reference
 
     See
@@ -665,7 +790,7 @@ def _format_reference(ref_input: dict) -> Reference:
         retraction = ref_input["retraction"]
         retraction_pmid = retraction.get("retractionPmid")
         retraction_source = retraction.get("retractionSource")
-    return Reference(
+    return ProtocolReference(
         pmid=ref_input.get("pmid"),
         type=ReferenceType(ref_input["type"].lower()) if "type" in ref_input else None,
         citation=ref_input.get("citation"),
@@ -674,22 +799,21 @@ def _format_reference(ref_input: dict) -> Reference:
     )
 
 
-Protocol = namedtuple(
-    "Protocol",
-    (
-        "identification",
-        "status",
-        "sponsor_collaborators",
-        "oversight",
-        "description",
-        "conditions",
-        "design",
-        "arms_intervention",
-        "outcomes",
-        "eligibility",
-        "references",
-    ),
-)
+class Protocol(NamedTuple):
+    """Define data structure for study Protocol Section"""
+
+    identification: ProtocolIdentification | None
+    status: ProtocolStatus | None
+    sponsor_collaborators: SponsorCollaborators | None
+    oversight: Oversight | None
+    description: ProtocolDescription | None
+    conditions: ProtocolConditions | None
+    design: ProtocolDesign | None
+    arms_intervention: ArmsInterventions | None
+    outcomes: Outcomes | None
+    eligibility: Eligibility | None
+    contacts_locations: ContactsLocationData | None
+    references: list[ProtocolReference] | None
 
 
 def _format_protocol(protocol_input: dict) -> Protocol:
@@ -725,7 +849,7 @@ def _format_protocol(protocol_input: dict) -> Protocol:
         oversight=_format_oversight(protocol_input["oversightModule"])
         if "oversightModule" in protocol_input
         else None,
-        description=_format_description(protocol_input["description"])
+        description=_format_protocol_description(protocol_input["description"])
         if "description" in protocol_input
         else None,
         conditions=conditions,
@@ -742,6 +866,9 @@ def _format_protocol(protocol_input: dict) -> Protocol:
         else None,
         eligibility=_format_eligibility(protocol_input["eligibilityModule"])
         if "eligibilityModule" in protocol_input
+        else None,
+        contacts_locations=_format_locations(protocol_input["contactsLocationsModule"])
+        if "contactsLocationsModule" in protocol_input
         else None,
         references=[
             _format_reference(r)
@@ -762,24 +889,35 @@ class EventAssessment(StrEnum):
     SYSTEMATIC_ASSESSMENT = "systematic_assessment"
 
 
-AdverseEventStat = namedtuple(
-    "AdverseEventStat", ("group_id", "num_events", "num_affected", "num_at_risk")
-)
-AdverseEvent = namedtuple(
-    "AdverseEvent",
-    ("term", "organ_system", "source_vocabulary", "assessment_type", "notes", "stats"),
-)
-AdverseEvents = namedtuple(
-    "AdverseEvents",
-    (
-        "frequency_threshold",
-        "timeframe",
-        "description",
-        "all_cause_mortality_comment",
-        "serious_events",
-        "other_events",
-    ),
-)
+class AdverseEventStat(NamedTuple):
+    """Define data structure for statistic relating to an adverse event description"""
+
+    group_id: str | None
+    num_events: int | None
+    num_affected: int | None
+    num_at_risk: int | None
+
+
+class AdverseEvent(NamedTuple):
+    """Define data structure for an individual adverse event description"""
+
+    term: str | None
+    organ_system: str | None
+    source_vocabulary: str | None
+    assessment_type: EventAssessment | None
+    notes: str | None
+    stats: list[AdverseEventStat] | None
+
+
+class AdverseEvents(NamedTuple):
+    """Define data structure for adverse events module (wrapper for individual reported events)"""
+
+    frequency_threshold: str | None
+    timeframe: str | None
+    description: str | None
+    all_cause_mortality_comment: str | None
+    serious_events: list[AdverseEvent] | None
+    other_events: list[AdverseEvent] | None
 
 
 def _format_event(event_input: dict) -> AdverseEvent:
@@ -834,7 +972,13 @@ def _format_adverse_events(aes_input: dict) -> AdverseEvents:
     )
 
 
-Results = namedtuple("Results", ("adverse_events"))
+class Results(NamedTuple):
+    """Define data structure for Results Section
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#resultsSection
+    """
+
+    adverse_events: AdverseEvents | None
 
 
 def _format_results(results_input: dict) -> Results:
@@ -852,8 +996,20 @@ def _format_results(results_input: dict) -> Results:
     )
 
 
-MeshConcept = namedtuple("MeshConcept", ("id", "term"))
-Derived = namedtuple("Derived", ("conditions"))
+class MeshConcept(NamedTuple):
+    """Define data structure for MeSH disease/phenotype item"""
+
+    id: str | None
+    term: str | None
+
+
+class Derived(NamedTuple):
+    """Define data structure for derived section
+
+    See https://clinicaltrials.gov/data-api/about-api/study-data-structure#derivedSection
+    """
+
+    conditions: list[MeshConcept] | None
 
 
 def _format_derived(der_input: dict) -> Derived:
@@ -875,7 +1031,12 @@ def _format_derived(der_input: dict) -> Derived:
     )
 
 
-Study = namedtuple("Study", ("protocol", "results", "derived"))
+class Study(NamedTuple):
+    """Define data structure for complete study."""
+
+    protocol: Protocol | None
+    results: Results | None
+    derived: Derived | None
 
 
 def _format_study(study_input: dict) -> Study:

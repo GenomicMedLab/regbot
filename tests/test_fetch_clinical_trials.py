@@ -5,7 +5,9 @@ import pytest
 import requests_mock
 
 from regbot.fetch.clinical_trials import (
+    CandidateSex,
     InterventionType,
+    Location,
     MeshConcept,
     Status,
     get_clinical_trials,
@@ -43,6 +45,19 @@ def test_fetch_clinical_trials(fixtures_dir: Path):
     assert (
         example.protocol.arms_intervention.interventions[0].type
         == InterventionType.GENETIC
+    )
+    assert "SMA diagnosis" in example.protocol.eligibility.description
+    assert example.protocol.eligibility.accepts_healthy is False
+    assert example.protocol.eligibility.sex == CandidateSex.ALL
+    assert len(example.protocol.contacts_locations.locations) == 13
+    assert example.protocol.contacts_locations.locations[4] == Location(
+        facility="Novartis Investigative Site",
+        city="Leuven",
+        postal_code="3000",
+        country="Belgium",
+        geo=(50.87959, 4.70093),
+        status=None,
+        state_province=None,
     )
     assert example.derived.conditions[0] == MeshConcept(
         id="D009133", term="Muscular Atrophy"
