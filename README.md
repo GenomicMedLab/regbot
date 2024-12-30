@@ -6,10 +6,14 @@
 [![Actions status](https://github.com/genomicmedlab/regbot/actions/workflows/checks.yaml/badge.svg)](https://github.com/genomicmedlab/regbot/actions/checks.yaml)
 
 <!-- description -->
-Fetch regulatory approval data for drug terms
+Acquire cleaned and structured data about drugs and therapeutics from US regulatory agencies and services:
+
+* ClinicalTrials.gov
+* Drugs@FDA
+* RxClass
 <!-- /description -->
 
-
+All data returned from regulatory APIs is structured as instances of standard library NamedTuples. This is done to give data structure and rudimentary type annotation (i.e. to benefit code editor and analysis tools) without adding runtime heft or being wedded to particular schema libraries like Pydantic. This may change in the future.
 
 ---
 

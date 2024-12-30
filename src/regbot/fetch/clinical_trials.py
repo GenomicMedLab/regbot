@@ -37,10 +37,6 @@ Get all serious adverse events:
     >>>          serious_events.append(event.term)
     >>> serious_events[:3]
     ['ANAEMIA', 'AUTOIMMUNE HAEMOLYTIC ANAEMIA', 'EVANS SYNDROME']
-
-The schema elements are structured as standard-library NamedTuple classes. This is done
-to provide very basic name-completion and type annotation, without being wedded to a
-particular schema library like Pydantic (though this could change in the future).
 """
 
 import datetime
