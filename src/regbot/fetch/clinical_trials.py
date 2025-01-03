@@ -76,7 +76,7 @@ def _get_dt_object(raw_date: str) -> datetime.datetime:
                 )
             except ValueError as e:
                 msg = f"Unable to format {raw_date} as YYYY-MM-DD, YYYY-MM, or YYYY"
-                _logger.error(msg)
+                _logger.exception(msg)
                 raise ValueError(msg) from e
 
 
@@ -1011,21 +1011,21 @@ def make_fda_clinical_trials_request(
         with requests.get(formatted_url, timeout=30) as r:
             try:
                 r.raise_for_status()
-            except RequestException as e:
-                _logger.warning(
+            except RequestException:
+                _logger.exception(
                     "Request to %s returned status code %s", url, r.status_code
                 )
-                raise e
+                raise
             raw_data = r.json()
             for i, study in enumerate(raw_data.get("studies", [])):
                 try:
                     parsed_data = _format_study(study)
-                except ValueError as e:
+                except ValueError:
                     if skip_parsing_failures:
                         nct_id = _get_id(study, formatted_url, i)
-                        _logger.warning("Failed to parse study %s: %s", nct_id, e)
+                        _logger.exception("Failed to parse study %s", nct_id)
                         continue
-                    raise e
+                    raise
                 results.append(parsed_data)
 
             next_page_token = raw_data.get("nextPageToken")

@@ -448,7 +448,7 @@ def _enumify(value: str | None, CandidateEnum: type[Enum]) -> Enum | str | None:
             .replace("/", "_")
         )
     except ValueError:
-        _logger.error(
+        _logger.exception(
             "Unable to enumify value '%s' into enum '%s'", value, CandidateEnum
         )
         return value
@@ -458,7 +458,7 @@ def _intify(value: str) -> int | None:
     try:
         return int(value)
     except ValueError:
-        _logger.error("Cannot convert value '%s' to int", value)
+        _logger.exception("Cannot convert value '%s' to int", value)
         return None
 
 
@@ -466,7 +466,7 @@ def _make_datetime(value: str) -> datetime.datetime | None:
     try:
         return datetime.datetime.strptime(value, "%Y%m%d").replace(tzinfo=datetime.UTC)
     except ValueError:
-        _logger.error("Unable to convert value '%s' to datetime", value)
+        _logger.exception("Unable to convert value '%s' to datetime", value)
         return None
 
 
@@ -654,11 +654,11 @@ def make_drugsatfda_request(
         with requests.get(full_url, timeout=30) as r:
             try:
                 r.raise_for_status()
-            except RequestException as e:
-                _logger.warning(
+            except RequestException:
+                _logger.exception(
                     "Request to %s returned status code %s", full_url, r.status_code
                 )
-                raise e
+                raise
             data = r.json()
         results += data["results"]
         skip = data["meta"]["results"]["skip"] + len(data["results"])

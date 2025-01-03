@@ -178,9 +178,11 @@ def make_rxclass_request(
     with requests.get(url, timeout=30) as r:
         try:
             r.raise_for_status()
-        except RequestException as e:
-            _logger.warning("Request to %s returned status code %s", url, r.status_code)
-            raise e
+        except RequestException:
+            _logger.exception(
+                "Request to %s returned status code %s", url, r.status_code
+            )
+            raise
         raw_data = r.json()
     if not raw_data:
         return []
