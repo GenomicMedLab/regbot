@@ -1,8 +1,8 @@
 """Fetch data from RxClass API."""
 
 import logging
-from collections import namedtuple
 from enum import Enum
+from typing import NamedTuple
 
 import requests
 from requests.exceptions import RequestException
@@ -10,15 +10,6 @@ from requests.exceptions import RequestException
 from regbot.fetch.class_utils import map_to_enum
 
 _logger = logging.getLogger(__name__)
-
-
-DrugConcept = namedtuple("DrugConcept", ("concept_id", "name", "term_type"))
-DrugClassification = namedtuple(
-    "DrugClassification", ("class_id", "class_name", "class_type", "class_url")
-)
-RxClassEntry = namedtuple(
-    "RxClassEntry", ("concept", "drug_classification", "relation", "relation_source")
-)
 
 
 class TermType(str, Enum):
@@ -48,6 +39,14 @@ class TermType(str, Enum):
     DFG = "dose_form_group"
 
 
+class DrugConcept(NamedTuple):
+    """Define drug concept object."""
+
+    concept_id: str
+    name: str
+    term_type: TermType
+
+
 class ClassType(str, Enum):
     """Define drug class types.
 
@@ -69,26 +68,13 @@ class ClassType(str, Enum):
     VA = "va"
 
 
-class RelationSource(str, Enum):
-    """Constrain relation source values."""
+class DrugClassification(NamedTuple):
+    """Define drug classification object."""
 
-    ATC = "atc"
-    ATCPROD = "atc_prod"
-    DAILYMED = "dailymed"
-    FDASPL = "fda_spl"
-    FMTSME = ("fmtsme",)
-    MEDRT = "med_rt"
-    RXNORM = "rxnorm"
-    SNOMEDCT = "snomedct"
-    VA = "va"
-
-    @classmethod
-    def _missing_(cls, value):  # noqa: ANN001 ANN206
-        return map_to_enum(
-            cls,
-            value,
-            {"atcprod": cls.ATCPROD, "medrt": cls.MEDRT, "fdaspl": cls.FDASPL},
-        )
+    class_id: str
+    class_name: str
+    class_type: ClassType
+    class_url: str | None
 
 
 class Relation(str, Enum):
@@ -118,61 +104,76 @@ class Relation(str, Enum):
         )
 
 
-def _get_concept(concept_raw: dict, normalize: bool) -> DrugConcept:
+class RelationSource(str, Enum):
+    """Constrain relation source values."""
+
+    ATC = "atc"
+    ATCPROD = "atc_prod"
+    DAILYMED = "dailymed"
+    FDASPL = "fda_spl"
+    FMTSME = ("fmtsme",)
+    MEDRT = "med_rt"
+    RXNORM = "rxnorm"
+    SNOMEDCT = "snomedct"
+    VA = "va"
+
+    @classmethod
+    def _missing_(cls, value):  # noqa: ANN001 ANN206
+        return map_to_enum(
+            cls,
+            value,
+            {"atcprod": cls.ATCPROD, "medrt": cls.MEDRT, "fdaspl": cls.FDASPL},
+        )
+
+
+class RxClassEntry(NamedTuple):
+    """Define RxClass entry object."""
+
+    concept: DrugConcept
+    drug_classification: DrugClassification
+    relation: Relation | None
+    relation_source: RelationSource | None
+
+
+def _get_concept(concept_raw: dict) -> DrugConcept:
     return DrugConcept(
         concept_id=f"rxcui:{concept_raw['rxcui']}",
         name=concept_raw["name"],
-        term_type=TermType[concept_raw["tty"]] if normalize else concept_raw["tty"],
+        term_type=TermType[concept_raw["tty"]],
     )
 
 
-def _get_classification(
-    classification_raw: dict, normalize: bool
-) -> DrugClassification:
+def _get_classification(classification_raw: dict) -> DrugClassification:
     return DrugClassification(
         class_id=classification_raw["classId"],
         class_name=classification_raw["className"],
-        class_type=ClassType(classification_raw["classType"].lower())
-        if normalize
-        else classification_raw["classType"],
+        class_type=ClassType(classification_raw["classType"].lower()),
         class_url=classification_raw.get("classUrl"),
     )
 
 
-def _get_relation(raw_value: str | None, normalize: bool) -> str | Relation | None:
-    if not raw_value:
-        return None
-    if normalize:
-        return Relation(raw_value.lower())
-    return raw_value
-
-
-def _get_relation_source(raw_value: str, normalize: bool) -> str | RelationSource:
-    return RelationSource(raw_value.lower()) if normalize else raw_value
-
-
-def _get_rxclass_entry(drug_info: dict, normalize: bool) -> RxClassEntry:
+def _get_rxclass_entry(drug_info: dict) -> RxClassEntry:
+    raw_relation = drug_info.get("rela")
+    relation = Relation(raw_relation.lower()) if raw_relation else None
+    raw_relation_source = drug_info.get("relaSource")
+    relation_source = (
+        RelationSource(raw_relation_source.lower()) if raw_relation_source else None
+    )
     return RxClassEntry(
-        concept=_get_concept(drug_info["minConcept"], normalize),
-        drug_classification=_get_classification(
-            drug_info["rxclassMinConceptItem"], normalize
-        ),
-        relation=_get_relation(drug_info.get("rela"), normalize),
-        relation_source=_get_relation_source(drug_info["relaSource"], normalize),
+        concept=_get_concept(drug_info["minConcept"]),
+        drug_classification=_get_classification(drug_info["rxclassMinConceptItem"]),
+        relation=relation,
+        relation_source=relation_source,
     )
 
 
-def make_rxclass_request(
-    url: str, include_snomedt: bool = False, normalize: bool = False
-) -> list[RxClassEntry]:
+def make_rxclass_request(url: str, include_snomedt: bool = False) -> list[RxClassEntry]:
     """Issue an API request to RxClass.
 
     :param url: RxClass API URL to request
     :param include_snomedct: if ``True``, include class claims provided by SNOMEDCT.
         These are provided under a different license from the rest of the data and
         may present publishability issues for data consumers.
-    :param normalize: if ``True``, try to normalize values to controlled enumerations
-        and appropriate Python datatypes
     :return: processed list of drug class descriptions from RxClass
     """
     with requests.get(url, timeout=30) as r:
@@ -185,7 +186,7 @@ def make_rxclass_request(
     if not raw_data:
         return []
     processed_results = [
-        _get_rxclass_entry(entry, normalize)
+        _get_rxclass_entry(entry)
         for entry in raw_data["rxclassDrugInfoList"]["rxclassDrugInfo"]
     ]
     if not include_snomedt:
@@ -196,7 +197,7 @@ def make_rxclass_request(
 
 
 def get_drug_class_info(
-    drug: str, include_snomedct: bool = False, normalize: bool = False
+    drug: str, include_snomedct: bool = False
 ) -> list[RxClassEntry]:
     """Get RxClass-provided drug info.
 
@@ -207,11 +208,9 @@ def get_drug_class_info(
     :param include_snomedct: if ``True``, include class claims provided by SNOMEDCT.
         These are provided under a different license from the rest of the data and
         may present publishability issues for data consumers.
-    :param normalize: if ``True``, try to normalize values to controlled enumerations
-        and appropriate Python datatypes
     :return: list of drug class descriptions from RxClass
     """
     url = (
         f"https://rxnav.nlm.nih.gov/REST/rxclass/class/byDrugName.json?drugName={drug}"
     )
-    return make_rxclass_request(url, include_snomedct, normalize)
+    return make_rxclass_request(url, include_snomedct)

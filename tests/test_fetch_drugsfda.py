@@ -17,7 +17,7 @@ def test_get_anda_results(fixtures_dir: Path):
             text=json_response.read(),
         )
 
-        results = get_anda_results("090721", True)
+        results = get_anda_results("090721")
         assert results
         assert len(results) > 0
 
@@ -32,6 +32,6 @@ def test_get_nda_results(fixtures_dir: Path):
             text=json_response.read(),
         )
 
-        results = get_nda_results("207145", True)
+        results = get_nda_results("207145")
         assert results
         assert len(results) > 0
