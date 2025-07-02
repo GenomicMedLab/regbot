@@ -24,10 +24,9 @@ dynamic = ["version"]
 [project.optional-dependencies]
 tests = ["pytest", "pytest-cov", "requests-mock"]
 dev = [
-    "pre-commit>=4.0.1",
-    "ruff==0.8.6",
+    "pre-commit>=4.2.0",
+    "ruff==0.12.1",
 ]
-
 
 [project.urls]
 Homepage = "https://github.com/genomicmedlab/regbot"
