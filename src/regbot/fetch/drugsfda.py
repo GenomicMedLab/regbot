@@ -636,6 +636,7 @@ def make_drugsatfda_request(url: str, limit: int = 500) -> list[Result] | None:
     results = []
     remaining = True
     skip = 0
+    skip_ceiling = 25000  # arbitrary, unrealistic ceiling to prevent insane skip values
     while remaining:
         full_url = f"{url}&limit={limit}&skip={skip}"
         _logger.debug("Issuing GET request to %s", full_url)
@@ -650,7 +651,7 @@ def make_drugsatfda_request(url: str, limit: int = 500) -> list[Result] | None:
             data = r.json()
         results += data["results"]
         skip = data["meta"]["results"]["skip"] + len(data["results"])
-        remaining = (data["meta"]["results"]["total"] > skip) or (skip >= 25000)
+        remaining = (data["meta"]["results"]["total"] > skip) or (skip >= skip_ceiling)
     return [_get_result(r) for r in results]
 
 
